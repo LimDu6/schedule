@@ -9,30 +9,34 @@
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
   padding-bottom:env(safe-area-inset-bottom,0px);
-  --bg:#f6f7f9; --panel:#ffffff; --ink:#1b2430; --muted:#5d6b7c; --line:#dde2e8;
-  --accent:#1f5f8b; --accent-soft:#e3eff7; --warn:#b3261e; --warn-soft:#fdeceb; --ok:#1d6b45; --ok-soft:#e5f4ec;
+  --bg:#f3f6fa; --panel:#ffffff; --ink:#0b1f3a; --muted:#51627a; --line:#d3dbe6;
+  --navy:#002e5d; --accent:#002e5d; --accent-soft:#e4ecf6; --warn:#b3261e; --warn-soft:#fdeceb; --ok:#1d6b45; --ok-soft:#e5f4ec;
   --hl:#fff6d6;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --bg:#12161c; --panel:#1a2029; --ink:#e7ebf0; --muted:#9aa7b6; --line:#2c3541;
-    --accent:#6fb2e0; --accent-soft:#1c2f3e; --warn:#ff8a80; --warn-soft:#3a1f1d; --ok:#79d3a3; --ok-soft:#1b3326; --hl:#3a3418;
+    --bg:#09162a; --panel:#0f2038; --ink:#e8eef6; --muted:#94a5bc; --line:#223653;
+    --navy:#001f40; --accent:#7db4ee; --accent-soft:#16305a; --warn:#ff8a80; --warn-soft:#3a1f1d; --ok:#79d3a3; --ok-soft:#1b3326; --hl:#3a3418;
   }
 }
 :root[data-theme="dark"]{
-  --bg:#12161c; --panel:#1a2029; --ink:#e7ebf0; --muted:#9aa7b6; --line:#2c3541;
-  --accent:#6fb2e0; --accent-soft:#1c2f3e; --warn:#ff8a80; --warn-soft:#3a1f1d; --ok:#79d3a3; --ok-soft:#1b3326; --hl:#3a3418;
+  --bg:#09162a; --panel:#0f2038; --ink:#e8eef6; --muted:#94a5bc; --line:#223653;
+  --navy:#001f40; --accent:#7db4ee; --accent-soft:#16305a; --warn:#ff8a80; --warn-soft:#3a1f1d; --ok:#79d3a3; --ok-soft:#1b3326; --hl:#3a3418;
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif}
-header{padding:20px 20px 8px;max-width:1200px;margin:0 auto}
-h1{font-size:22px;margin:0 0 4px;font-weight:650}
-header p{margin:0;color:var(--muted);max-width:75ch}
+header{background:var(--navy);color:#fff;padding:22px max(20px,calc((100% - 1160px)/2)) 18px;border-bottom:4px solid var(--accent-soft)}
+h1{font-size:24px;margin:0 0 6px;font-weight:700;letter-spacing:.2px}
+header p{margin:0;color:rgba(255,255,255,.86);max-width:80ch;font-size:14px}
+header b{color:#fff}
+header .tag.warn{background:#fff;color:var(--warn);border-color:#fff}
+:root[data-theme="dark"] header .tag.warn,:root:not([data-theme="light"]) header .tag.warn{color:#b3261e}
 .wrap{max-width:1200px;margin:0 auto;padding:12px 20px 40px}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;flex-wrap:wrap}
 .tab{background:none;border:0;padding:10px 14px;font:inherit;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
-.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
+.tab:hover{color:var(--accent)}
 .tab[data-tab="fill"][aria-selected="true"]{border-bottom-color:var(--ok)}
 .tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .badge{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-size:12px;text-align:center}
@@ -44,7 +48,7 @@ input[type=search]{min-width:220px;flex:1;max-width:340px}
 .tablewrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:12px}
 table{border-collapse:collapse;width:100%;min-width:860px}
 th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
-th{font-size:13px;color:var(--muted);font-weight:600;background:var(--panel);position:sticky;top:0;cursor:pointer;white-space:nowrap;user-select:none}
+th{font-size:13px;color:var(--accent);font-weight:700;background:var(--accent-soft);position:sticky;top:0;cursor:pointer;white-space:nowrap;user-select:none}
 tr:last-child td{border-bottom:0}
 tr.sel td{background:var(--accent-soft)}
 tr.clash td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
@@ -61,7 +65,7 @@ button.add.sw[aria-pressed="true"]{background:var(--ok);color:var(--panel)}
 .ovl.go{color:var(--ok)}
 .none{color:var(--muted)}
 .group{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:12px;overflow:hidden}
-.group h3{margin:0;padding:10px 14px;font-size:15px;background:var(--accent-soft);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.group h3{margin:0;padding:10px 14px;font-size:15px;background:var(--accent-soft);color:var(--accent);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .group.sw h3{background:var(--ok-soft)}
 .group h3 span{color:var(--muted);font-weight:400;font-size:13px}
 .group ul{list-style:none;margin:0;padding:0}
@@ -108,6 +112,17 @@ ul.mini .nm{flex:1;min-width:160px}
 .fl{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:13px}
 .lnk{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit;font-size:12px;padding:2px 0}
 tr.done td{opacity:.55}
+:root{--star:#c58a00}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--star:#f2c14e}}
+:root[data-theme="dark"]{--star:#f2c14e}
+.star{border:0;background:none;cursor:pointer;font-size:18px;line-height:1;padding:2px 6px 2px 0;color:var(--muted);vertical-align:middle}
+.star[aria-pressed="true"]{color:var(--star)}
+.star:hover{color:var(--star)}
+.lnks{display:flex;gap:0 12px;flex-wrap:wrap}
+.tab[data-tab="favs"][aria-selected="true"]{border-bottom-color:var(--star)}
+.badge.fv{background:var(--hl);color:var(--star)}
+.badge.sk{background:var(--line);color:var(--muted)}
+.acthead{display:flex;align-items:center;gap:2px}
 .group.dn{opacity:.6}
 </style>
 </head>
@@ -117,13 +132,16 @@ tr.done td{opacity:.55}
   <p>Pick your MBA classes first. Then open <b>SWELL classes</b> to see only the SWELL activities that fit around them.</p>
   <p style="margin-top:6px">Sections tagged <span class="tag warn" style="margin:0">Conflicts with 1st year core classes</span> overlap the 1st year core schedule (Tue/Thu 8:00–9:15, 9:30–10:45 and 12:30–1:45).</p>
   <p style="margin-top:6px">Already taken a class? Click <b>Mark completed</b> on it. It then disappears from the lists and from the overlap warnings.</p>
+  <p style="margin-top:6px">Tap <b>☆</b> to save a class to your <b>Favorites</b> tab. Click <b>Not for me</b> on a class you don't want to see: it's hidden everywhere and parked on the <b>Not for me</b> tab, where you can bring it back any time.</p>
 </header>
 <div class="wrap">
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" data-tab="all" aria-selected="true">MBA classes</button>
     <button class="tab" role="tab" data-tab="slots" aria-selected="false">Same-time groups</button>
+    <button class="tab" role="tab" data-tab="favs" aria-selected="false">Favorites<span class="badge fv" id="cntfav">0</span></button>
     <button class="tab" role="tab" data-tab="mine" aria-selected="false">My schedule<span class="badge" id="cnt">0</span></button>
     <button class="tab" role="tab" data-tab="fill" aria-selected="false">SWELL classes<span class="badge sw" id="cntsw">0</span></button>
+    <button class="tab" role="tab" data-tab="skip" aria-selected="false">Not for me<span class="badge sk" id="cntskip">0</span></button>
   </div>
   <div id="view"></div>
 </div>
@@ -391,12 +409,22 @@ let done=new Set();
 try{const v=JSON.parse(localStorage.getItem("done-keys")||"[]");if(Array.isArray(v))v.forEach(k=>done.add(k))}catch(e){}
 const saveDone=()=>{try{localStorage.setItem("done-keys",JSON.stringify([...done]))}catch(e){}};
 const isDone=x=>done.has(doneKey(x));
-const vis=x=>showDone||!isDone(x);
-const overOf=c=>c.over.filter(o=>!isDone(o));
+// Favorites and "Not for me" use the same per-course key as Completed
+let favs=new Set(),skips=new Set();
+try{const v=JSON.parse(localStorage.getItem("fav-keys")||"[]");if(Array.isArray(v))v.forEach(k=>favs.add(k))}catch(e){}
+try{const v=JSON.parse(localStorage.getItem("skip-keys")||"[]");if(Array.isArray(v))v.forEach(k=>skips.add(k))}catch(e){}
+skips.forEach(k=>favs.delete(k));
+const saveFav=()=>{try{localStorage.setItem("fav-keys",JSON.stringify([...favs]))}catch(e){}};
+const saveSkip=()=>{try{localStorage.setItem("skip-keys",JSON.stringify([...skips]))}catch(e){}};
+const isFav=x=>favs.has(doneKey(x));
+const isSkip=x=>skips.has(doneKey(x));
+const vis=x=>!isSkip(x)&&(showDone||!isDone(x));
+const overOf=c=>c.over.filter(o=>!isDone(o)&&!isSkip(o));
+const starBtn=k=>{const on=favs.has(k);return `<button class="star" data-fav="${esc(k)}" aria-pressed="${on}" aria-label="${on?"Remove from favorites":"Add to favorites"}" title="${on?"Remove from favorites":"Add to favorites"}">${on?"★":"☆"}</button>`};
 let sel=new Set();
 try{const v=JSON.parse(localStorage.getItem("mba-sel")||"[]");if(Array.isArray(v))v.forEach(i=>{if(C[i])sel.add(i)})}catch(e){}
 try{const v=JSON.parse(localStorage.getItem("swell-sel")||"[]");if(Array.isArray(v))v.forEach(k=>{const x=S.find(s=>s.key===k);if(x)sel.add(x.id)})}catch(e){}
-[...sel].forEach(i=>{if(isDone(A(i)))sel.delete(i)});
+[...sel].forEach(i=>{if(isDone(A(i))||isSkip(A(i)))sel.delete(i)});
 const save=()=>{
   try{localStorage.setItem("mba-sel",JSON.stringify([...sel].filter(i=>i<1000)))}catch(e){}
   try{localStorage.setItem("swell-sel",JSON.stringify([...sel].filter(i=>i>=1000).map(i=>A(i).key)))}catch(e){}
@@ -418,7 +446,7 @@ const lbl=c=>c.code+" "+c.name;
 const CORE=[[480,555],[570,645],[750,825]];
 const coreHit=x=>!x.online&&(x.days.includes("T")||x.days.includes("R"))&&CORE.some(([s,e])=>x.s<e&&s<x.e);
 const coreTag=x=>coreHit(x)?`<span class="tag warn">Conflicts with 1st year core classes</span>`:"";
-const mbaSame=x=>x.online?[]:C.filter(c=>!isDone(c)&&overlap(c,x));
+const mbaSame=x=>x.online?[]:C.filter(c=>!isDone(c)&&!isSkip(c)&&overlap(c,x));
 const doneCtl=()=>`<label class="chk"><input type="checkbox" id="showdone" ${showDone?"checked":""}> Show completed classes (${done.size})</label><button class="clear" style="margin-left:0" data-cleardone="1">Clear completed</button>`;
 const blkTxt=b=>b==="1st"?"1st block · Jan 6–Feb 24":b==="2nd"?"2nd block · Feb 25–Apr 14":"";
 const fmtCr=n=>Number.isInteger(n)?String(n):n.toFixed(1);
@@ -443,13 +471,13 @@ function rowHTML(c,cl){
   const on=sel.has(c.id);
   const ov=overOf(c).length,dn=isDone(c),dk=esc(doneKey(c));
   return `<tr class="${on?"sel":""} ${cl.has(c.id)?"clash":""} ${dn?"done":""}" id="r${c.id}">
-    <td><span class="code">${esc(c.code)}</span></td>
+    <td>${starBtn(dk)}<span class="code">${esc(c.code)}</span></td>
     <td>${esc(c.name)}<div class="sub">${esc(c.room)} · ${c.cr} cr · ${c.seats} seats</div>
       ${c.note?c.note.split(/ (?=℀)/).map(n=>`<span class="tag">${esc(n)}</span>`).join(""):""}${coreTag(c)}</td>
     <td>${esc(c.prof)}</td>
     <td class="time">${esc(timeStr(c))}</td>
     <td>${dn?`<span class="none">–</span>`:ov?`<button class="ovl" data-ov="${c.id}" aria-expanded="${open.has(c.id)}">${ov} overlap${ov>1?"s":""} ${open.has(c.id)?"▴":"▾"}</button>`:`<span class="none">none</span>`}</td>
-    <td>${dn?`<span class="tag ok">Completed</span>`:`<button class="add" data-add="${c.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}<div><button class="lnk" data-done="${dk}">${dn?"Undo completed":"Mark completed"}</button></div></td></tr>`+(open.has(c.id)&&!dn?detailHTML(c):"");
+    <td>${dn?`<span class="tag ok">Completed</span>`:`<button class="add" data-add="${c.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}<div class="lnks"><button class="lnk" data-done="${dk}">${dn?"Undo completed":"Mark completed"}</button><button class="lnk" data-skip="${dk}">Not for me</button></div></td></tr>`+(open.has(c.id)&&!dn?detailHTML(c):"");
 }
 
 function detailHTML(c){
@@ -518,7 +546,7 @@ function slotsView(){
     const g=groups[k],c0=g[0];
     if(c0.days!==lastDay){lastDay=c0.days;html+=`<h2 class="daytitle">${pat(c0)}</h2>`}
     html+=`<div class="group"><h3>${fmt(c0.s)}–${fmt(c0.e)}<span>${g.length} section${g.length>1?"s":""}</span></h3><ul>`+
-      g.map(c=>`<li><span class="code" style="min-width:92px">${esc(c.code)}</span><span class="nm">${esc(c.name)}<div class="sub">${esc(c.prof)} · ${esc(c.room)}</div>${coreTag(c)}</span>
+      g.map(c=>`<li>${starBtn(doneKey(c))}<span class="code" style="min-width:92px">${esc(c.code)}</span><span class="nm">${esc(c.name)}<div class="sub">${esc(c.prof)} · ${esc(c.room)}</div>${coreTag(c)}</span>
       <button class="add" data-add="${c.id}" aria-pressed="${sel.has(c.id)}">${sel.has(c.id)?"Added":"Add"}</button></li>`).join("")+`</ul></div>`;
   });
   return html;
@@ -669,27 +697,67 @@ function fillView(){
   if(!acts.length){
     html+=`<div class="note empty">No SWELL sections fit those filters. Try a wider time window${hidden?`, or turn on "Also show sections that conflict"`:""}.</div>`;
   }else{
-    html+=acts.map(k=>{
-      const g=byAct[k].sort((a,b)=>dayRank(a)-dayRank(b)||(a.online?0:a.s)-(b.online?0:b.s)||a.sec.localeCompare(b.sec));
-      const o=isOpenAct(k),nAdd=g.filter(x=>sel.has(x.id)).length;
-      return `<div class="group sw ${isDone(g[0])?"dn":""}"><h3><button class="acthd" data-act="${k}" aria-expanded="${o}">${o?"▾":"▸"} ${esc(TITLES[k])}<span class="sub">SWELL ${k}</span></button><span>${nAdd?`${nAdd} added · `:""}${g.length} section${g.length>1?"s":""} · <button class="lnk" data-done="s:${k}">${isDone(g[0])?"Undo completed":"Mark completed"}</button></span></h3>${o?`<ul>${g.map(swRow).join("")}</ul>`:""}</div>`}).join("");
+    html+=acts.map(k=>swGroup(k,byAct[k])).join("");
   }
   html+=`<div class="note"><b>Notes.</b> Every SWELL section is 0.5 credit. Semester runs Jan 6 – Apr 14, 2027; 1st block is Jan 6–Feb 24 and 2nd block is Feb 25–Apr 14, so a 1st-block and a 2nd-block section can share a time slot. MBA classes are treated as running the full semester. Buildings: RB Richards · SFH Smith Fieldhouse · WSC Wilkinson Student Center · IPF Indoor Practice Facility · RBF/NUF fields · TCF/TCB tennis · SFLD/GLFG golf. Scuba meets for a 6:00pm classroom hour, then a pool or dive session 8:00–9:50pm; it is shown here as one block. Seat counts are from Oct 9, 2026, so check MyMAP before you register.</div>`;
   return html;
 }
 
+
+function swGroup(k,list){
+  const g=[...list].sort((a,b)=>dayRank(a)-dayRank(b)||(a.online?0:a.s)-(b.online?0:b.s)||a.sec.localeCompare(b.sec));
+  const o=isOpenAct(k),nAdd=g.filter(x=>sel.has(x.id)).length,key="s:"+k;
+  return `<div class="group sw ${isDone(g[0])?"dn":""}"><h3><span class="acthead">${starBtn(key)}<button class="acthd" data-act="${k}" aria-expanded="${o}">${o?"▾":"▸"} ${esc(TITLES[k])}<span class="sub">SWELL ${k}</span></button></span><span>${nAdd?`${nAdd} added · `:""}${g.length} section${g.length>1?"s":""} · <button class="lnk" data-done="${key}">${isDone(g[0])?"Undo completed":"Mark completed"}</button> · <button class="lnk" data-skip="${key}">Not for me</button></span></h3>${o?`<ul>${g.map(swRow).join("")}</ul>`:""}</div>`;
+}
+
+function favsView(){
+  const cl=clashIds();
+  const m=sorted(C.filter(c=>isFav(c)&&vis(c)));
+  const sw=S.filter(x=>isFav(x)&&vis(x));
+  const byAct={};sw.forEach(x=>(byAct[x.num]=byAct[x.num]||[]).push(x));
+  const acts=Object.keys(byAct).sort((a,b)=>TITLES[a].localeCompare(TITLES[b]));
+  if(!m.length&&!acts.length){
+    return `<div class="note empty">No favorites yet. Tap the <b>☆</b> next to any MBA or SWELL class and it will be saved here, so you can compare your shortlist and add the sections you want.</div>`+(done.size?`<div class="controls">${doneCtl()}</div>`:"");
+  }
+  const th=(k,l)=>`<th data-sort="${k}">${l}${sortK===k?(sortDir>0?" ▲":" ▼"):""}</th>`;
+  let html=`<div class="note">Your shortlist. Favoriting a class saves every section of it. Use <b>Add</b> to put a section on your schedule.</div>`;
+  if(done.size)html+=`<div class="controls">${doneCtl()}</div>`;
+  if(m.length)html+=`<h2 class="daytitle">MBA classes</h2><div class="tablewrap"><table>
+    <thead><tr>${th("code","Code")}${th("name","Class")}${th("prof","Professor")}${th("time","Time")}<th style="cursor:default">Same time as</th><th style="cursor:default"></th></tr></thead>
+    <tbody>${m.map(c=>rowHTML(c,cl)).join("")}</tbody></table></div>`;
+  if(acts.length){
+    autoOpen=sw.length<=30;
+    html+=`<h2 class="daytitle">SWELL classes</h2>`+acts.map(k=>swGroup(k,byAct[k])).join("");
+  }
+  return html;
+}
+
+function skipView(){
+  const items={};
+  const add=(x,title,kind)=>{const k=doneKey(x);(items[k]=items[k]||{k,title,kind,n:0}).n++};
+  C.forEach(c=>{if(isSkip(c))add(c,c.code.split("-")[0]+" "+c.name,"MBA")});
+  S.forEach(x=>{if(isSkip(x))add(x,"SWELL "+x.num+" "+x.name,"SWELL")});
+  const list=Object.values(items).sort((a,b)=>a.kind.localeCompare(b.kind)||a.title.localeCompare(b.title));
+  if(!list.length)return `<div class="note empty">Nothing here. Click <b>Not for me</b> on a class you don't want to see and it will be hidden from every list and parked here.</div>`;
+  return `<div class="note">These classes are hidden from every list and from the overlap warnings. Bring one back and it returns to the lists.</div>
+  <div class="controls"><span class="sub">${list.length} class${list.length===1?"":"es"} hidden</span><button class="clear" data-clearskip="1">Bring all back</button></div>
+  <div class="group"><ul>${list.map(i=>`<li><span class="nm"><b>${esc(i.title)}</b><div class="sub">${i.n} section${i.n===1?"":"s"}</div></span><span class="tag ${i.kind==="SWELL"?"ok":""}">${i.kind}</span><button class="add" data-skip="${esc(i.k)}">Bring back</button></li>`).join("")}</ul></div>`;
+}
+
 function render(keepFocus){
   document.getElementById("cnt").textContent=sel.size;
   document.getElementById("cntsw").textContent=[...sel].filter(i=>i>=1000).length;
+  document.getElementById("cntfav").textContent=favs.size;
+  document.getElementById("cntskip").textContent=skips.size;
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.tab===tab));
   const v=document.getElementById("view");
-  v.innerHTML=tab==="all"?allView():tab==="slots"?slotsView():tab==="fill"?fillView():mineView();
+  v.innerHTML=tab==="all"?allView():tab==="slots"?slotsView():tab==="fill"?fillView():tab==="favs"?favsView():tab==="skip"?skipView():mineView();
   if(keepFocus){const el=document.getElementById(tab==="fill"?"swq":"q");const len=tab==="fill"?swQ.length:q.length;if(el){el.focus();el.setSelectionRange(len,len)}}
 }
 
 const keepY=fn=>{const y=window.scrollY;fn();render();window.scrollTo(0,y)};
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-add],[data-sort],[data-ov],[data-focus],[data-clearfocus],[data-clearall],[data-clearsw],[data-gap],[data-act],[data-swreset],[data-done],[data-cleardone]");
+  const t=e.target.closest("[data-tab],[data-add],[data-sort],[data-ov],[data-focus],[data-clearfocus],[data-clearall],[data-clearsw],[data-gap],[data-act],[data-swreset],[data-done],[data-cleardone],[data-fav],[data-skip],[data-clearskip]");
   if(!t)return;
   if(t.dataset.tab){tab=t.dataset.tab;render();window.scrollTo(0,0)}
   else if(t.dataset.add!==undefined){const i=+t.dataset.add;keepY(()=>{sel.has(i)?sel.delete(i):sel.add(i);save()})}
@@ -704,6 +772,9 @@ document.addEventListener("click",e=>{
   else if(t.dataset.act){const k=t.dataset.act;keepY(()=>{actState[k]=!isOpenAct(k)})}
   else if(t.dataset.done){const k=t.dataset.done;keepY(()=>{if(done.has(k))done.delete(k);else{done.add(k);[...sel].forEach(i=>{if(doneKey(A(i))===k)sel.delete(i)})}saveDone();save()})}
   else if(t.dataset.cleardone){done.clear();saveDone();render()}
+  else if(t.dataset.fav){const k=t.dataset.fav;keepY(()=>{if(favs.has(k))favs.delete(k);else{favs.add(k);skips.delete(k)}saveFav();saveSkip()})}
+  else if(t.dataset.skip){const k=t.dataset.skip;keepY(()=>{if(skips.has(k))skips.delete(k);else{skips.add(k);favs.delete(k);[...sel].forEach(i=>{if(doneKey(A(i))===k)sel.delete(i)})}saveFav();saveSkip();save()})}
+  else if(t.dataset.clearskip){skips.clear();saveSkip();render()}
   else if(t.dataset.swreset){swQ="";swDay="";swAfter="";swBefore="";swBlock="";swOnline=true;swShowConf=false;render()}
 });
 document.addEventListener("input",e=>{
