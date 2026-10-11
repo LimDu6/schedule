@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Winter 2027 Schedule Planner (MBA + SWELL)</title>
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#f6f7f9; --panel:#ffffff; --ink:#1b2430; --muted:#5d6b7c; --line:#dde2e8;
+  --accent:#1f5f8b; --accent-soft:#e3eff7; --warn:#b3261e; --warn-soft:#fdeceb; --ok:#1d6b45; --ok-soft:#e5f4ec;
+  --hl:#fff6d6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12161c; --panel:#1a2029; --ink:#e7ebf0; --muted:#9aa7b6; --line:#2c3541;
+    --accent:#6fb2e0; --accent-soft:#1c2f3e; --warn:#ff8a80; --warn-soft:#3a1f1d; --ok:#79d3a3; --ok-soft:#1b3326; --hl:#3a3418;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12161c; --panel:#1a2029; --ink:#e7ebf0; --muted:#9aa7b6; --line:#2c3541;
+  --accent:#6fb2e0; --accent-soft:#1c2f3e; --warn:#ff8a80; --warn-soft:#3a1f1d; --ok:#79d3a3; --ok-soft:#1b3326; --hl:#3a3418;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Segoe UI",system-ui,-apple-system,Helvetica,Arial,sans-serif}
+header{padding:20px 20px 8px;max-width:1200px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px;font-weight:650}
+header p{margin:0;color:var(--muted);max-width:75ch}
+.wrap{max-width:1200px;margin:0 auto;padding:12px 20px 40px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;flex-wrap:wrap}
+.tab{background:none;border:0;padding:10px 14px;font:inherit;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent);font-weight:600}
+.tab[data-tab="fill"][aria-selected="true"]{border-bottom-color:var(--ok)}
+.tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.badge{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-size:12px;text-align:center}
+.badge.sw{background:var(--ok-soft);color:var(--ok)}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+input[type=search],select{padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit}
+input[type=search]{min-width:220px;flex:1;max-width:340px}
+.chk{display:flex;gap:6px;align-items:center;color:var(--muted)}
+.tablewrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:12px}
+table{border-collapse:collapse;width:100%;min-width:860px}
+th,td{padding:9px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:13px;color:var(--muted);font-weight:600;background:var(--panel);position:sticky;top:0;cursor:pointer;white-space:nowrap;user-select:none}
+tr:last-child td{border-bottom:0}
+tr.sel td{background:var(--accent-soft)}
+tr.clash td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
+.code{font-weight:600;white-space:nowrap}
+.sub{color:var(--muted);font-size:13px}
+.time{white-space:nowrap}
+.tag{display:inline-block;font-size:12px;padding:1px 7px;border-radius:10px;border:1px solid var(--line);color:var(--muted);margin:2px 4px 0 0}
+.tag.warn{color:var(--warn);border-color:var(--warn)}
+button.add{border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:6px;padding:5px 10px;font:inherit;cursor:pointer;white-space:nowrap}
+button.add[aria-pressed="true"]{background:var(--accent);color:var(--panel)}
+button.add.sw{border-color:var(--ok);color:var(--ok)}
+button.add.sw[aria-pressed="true"]{background:var(--ok);color:var(--panel)}
+.ovl{border:0;background:none;color:var(--warn);cursor:pointer;font:inherit;padding:0;text-decoration:underline}
+.ovl.go{color:var(--ok)}
+.none{color:var(--muted)}
+.group{background:var(--panel);border:1px solid var(--line);border-radius:8px;margin-bottom:12px;overflow:hidden}
+.group h3{margin:0;padding:10px 14px;font-size:15px;background:var(--accent-soft);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.group.sw h3{background:var(--ok-soft)}
+.group h3 span{color:var(--muted);font-weight:400;font-size:13px}
+.group ul{list-style:none;margin:0;padding:0}
+.group li{display:flex;gap:12px;padding:8px 14px;border-top:1px solid var(--line);align-items:center;flex-wrap:wrap}
+.group li.sel{background:var(--ok-soft)}
+.group li .nm{flex:1;min-width:220px}
+.acthd{background:none;border:0;padding:0;font:inherit;font-weight:600;color:var(--ink);cursor:pointer;text-align:left}
+.acthd .sub{margin-left:6px;font-weight:400}
+.daytitle{margin:18px 0 8px;font-size:17px}
+.note{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px;color:var(--muted);margin-bottom:12px}
+.note.warn{background:var(--warn-soft);border-color:var(--warn);color:var(--ink)}
+.note.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ink)}
+.note b{color:var(--ink)}
+.grid{display:grid;grid-template-columns:56px repeat(5,minmax(120px,1fr));min-width:720px;background:var(--panel);border:1px solid var(--line);border-radius:8px;position:relative}
+.gwrap{overflow-x:auto}
+.gh{padding:8px;text-align:center;font-weight:600;border-bottom:1px solid var(--line);border-left:1px solid var(--line);font-size:13px}
+.gh:first-child{border-left:0}
+.col{position:relative;border-left:1px solid var(--line)}
+.hr{position:absolute;left:0;right:0;border-top:1px dashed var(--line);font-size:11px;color:var(--muted)}
+.timecol{position:relative}
+.timecol .hr{border:0;padding-left:6px;transform:translateY(-7px)}
+.ev{position:absolute;border-radius:5px;padding:3px 5px;font-size:12px;line-height:1.25;overflow:hidden;background:var(--accent-soft);border:1px solid var(--accent);color:var(--ink)}
+.ev.sw{background:var(--ok-soft);border-color:var(--ok)}
+.ev.clash{background:var(--warn-soft);border-color:var(--warn)}
+.ev b{display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin:8px 0}
+.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle}
+tr.detail td{background:var(--bg);padding:0}
+.dbox{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;padding:12px 14px;border-left:3px solid var(--warn)}
+.dcol h4{margin:0 0 6px;font-size:14px}
+ul.mini{list-style:none;margin:0;padding:0}
+ul.mini li{display:flex;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+ul.mini li:first-child{border-top:0}
+ul.mini .nm{flex:1;min-width:160px}
+.dfoot{grid-column:1/-1;display:flex;gap:16px}
+.tag.ok{color:var(--ok);border-color:var(--ok)}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.clear{margin-left:auto;border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit}
+.gaps{display:grid;gap:6px;margin-top:10px}
+.gaprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.gaprow .d{width:40px;font-weight:600;color:var(--ink)}
+.chip{border:1px solid var(--ok);background:transparent;color:var(--ok);border-radius:999px;padding:2px 10px;font:inherit;font-size:13px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ok);color:var(--panel)}
+.fl{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Winter 2027 schedule planner</h1>
+  <p>Pick your MBA classes first. Then open <b>SWELL classes</b> to see only the SWELL activities that fit around them.</p>
+  <p style="margin-top:6px">Sections tagged <span class="tag warn" style="margin:0">Conflicts with 1st year core classes</span> overlap the 1st year core schedule (Tue/Thu 8:00–9:15, 9:30–10:45 and 12:30–1:45).</p>
+</header>
+<div class="wrap">
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" data-tab="all" aria-selected="true">MBA classes</button>
+    <button class="tab" role="tab" data-tab="slots" aria-selected="false">Same-time groups</button>
+    <button class="tab" role="tab" data-tab="mine" aria-selected="false">My schedule<span class="badge" id="cnt">0</span></button>
+    <button class="tab" role="tab" data-tab="fill" aria-selected="false">SWELL classes<span class="badge sw" id="cntsw">0</span></button>
+  </div>
+  <div id="view"></div>
+</div>
+
+<script>
+const TITLES={102:"Meditation",103:"STRONG Nation",104:"Cardio Fitness",105:"Pickleball",107:"Pilates",108:"Zumba",109:"Yoga",110:"Indoor Cycling",111:"Basketball, Beginning",112:"Basketball, Intermediate",113:"Ultimate Frisbee",114:"Barre",115:"Recess and Lawn Games",116:"Bowling, Beginning",117:"Bowling, Intermediate",120:"Indoor Rock Climbing",121:"Diving, Springboard",125:"Functional Fitness",131:"Golf, Beginning",132:"Golf, Intermediate",136:"Gymnastics, Beginning",139:"Running",141:"Martial Arts",146:"Racquetball, Beginning",147:"Racquetball, Intermediate",150:"Ice Skating, Beginning",151:"Ice Hockey, Beginning",152:"Ice Skating, Intermediate",153:"Ice Hockey, Intermediate",155:"Self-Defense",156:"Soccer, Beginning",157:"Soccer, Intermediate",161:"Skiing",162:"Snowboarding",164:"Skiing, Cross-Country",170:"Swimming for Non-Swimmers",171:"Swimming, Beginning",172:"Swimming, Intermediate",175:"Scuba Diving, Beginning",176:"Scuba Diving, Intermediate",179:"Aqua Fitness",181:"Tennis, Beginning",182:"Tennis, Intermediate",186:"Volleyball, Beginning",187:"Volleyball, Intermediate",191:"Weight Training"};
+const RAW=`102|001|MW|1100|1150|RB|Maria Jenson|25/25|
+102|002|MW|1200|1250|RB|Maria Jenson|25/25|
+102|003|TTh|0900|0950|RB|Maria Jenson|25/25|
+102|004|online|||Online|Maria Jenson|200/200|
+103|001|MW|0700|0750|RB|Megan Mattei|45/45|
+104|002|TTh|0700|0750|RB|Sydney Rodriguez|45/45|
+104|003|MW|1300|1350|RB|Audra Jeske|45/45|
+104|004|TTh|1400|1450|RB|Kate Klingonsmith|45/45|
+105|001|MW|0800|0850|RB|Jessie Dorathy|34/34|
+105|002|MW|1100|1150|RB|Garren Craig|34/34|
+105|003|TTh|0800|0850|RB|Tyler Aughenbaugh|34/34|
+105|004|TTh|0900|0950|RB|Tyler Aughenbaugh|34/34|
+105|005|TTh|1000|1050|RB|Tyler Aughenbaugh|34/34|
+105|006|F|0800|0950|RB|Par Karlberg|34/34|
+105|007|F|0615|0750|RB|RJ Mattei|34/34|
+105|008|online|||Online|Jessie Dorathy|75/75|2nd
+107|001|MW|0800|0850|SFH|Tiraje Earnshaw|22/22|
+107|002|MW|0900|0950|SFH|Tiraje Earnshaw|22/22|
+107|003|TTh|1000|1050|RB|Goulding|30/30|
+107|004|MW|1700|1750|SFH|Williams|22/22|
+108|001|TTh|0900|0950|RB|Parcell|75/75|
+108|002|TTh|0800|0850|RB|Mattei|75/75|
+108|003|TTh|1000|1050|RB|Parcell|45/45|
+109|001|MW|0800|0850|HRCN|Hyde|50/50|
+109|002|MW|0900|0950|HRCN|Hyde|50/50|
+109|003|MW|1600|1650|RB|Williams|45/45|
+109|004|TTh|1200|1250|SFH|Kate Klingonsmith|22/22|
+109|005|TTh|0700|0750|CANC|Goulding|50/50|
+109|006|TTh|0800|0850|CANC|Goulding|50/50|
+109|007|TTh|0900|0950|SFH|Tiraje Earnshaw|22/22|
+109|008|TTh|0800|0850|SFH|Tiraje Earnshaw|22/22|
+109|009|online|||Online|Pyne|120/120|
+110|001|MW|0700|0750|RB|Hopkins|24/24|
+110|002|MW|0800|0850|RB|Kelemen|24/24|
+110|003|MW|0900|0950|RB|Kelemen|24/24|
+110|004|MW|1000|1050|RB|Hyde|24/24|
+110|005|MW|1200|1250|RB|Vaughan|24/24|
+110|006|MW|1600|1650|RB|Loren Smith|24/24|
+110|007|MW|1700|1750|RB|Loren Smith|24/24|
+110|008|TTh|0700|0750|RB|Hopkins|24/24|
+110|009|TTh|0900|0950|RB|Hyde|24/24|
+110|010|TTh|1000|1050|RB|Cheney|24/24|
+110|011|TTh|1300|1350|RB|Loren Smith|24/24|
+110|012|TTh|1600|1650|RB|Loren Smith|24/24|
+110|013|TTh|1700|1750|RB|Loren Smith|24/24|
+110|014|online|||Online|Loren Smith|50/50|
+111|001|MW|1300|1350|RB|Jessie Dorathy|37/37|
+111|002|MW|1400|1450|RB|Jessie Dorathy|37/37|
+111|003|TTh|0800|0850|RB|Tahis Smith|37/37|
+111|004|TTh|0900|0950|RB|Tahis Smith|37/37|
+111|006|online|||Online|Jessie Dorathy|37/37|
+112|001|MW|1500|1550|RB|Jessie Dorathy|37/37|
+112|002|MW|1600|1650|RB|Huntington|37/37|
+112|003|MW|1700|1750|RB|Huntington|37/37|
+112|004|TTh|1000|1050|RB||37/37|
+113|001|TTh|1400|1550|NUF|Hyde|40/40|2nd
+114|001|MW|1400|1450|RB|Tahis Smith|28/28|
+115|001|F|1000|1150|RBF/RB/NUF|Loren Smith|24/24|2nd
+116|001|MW|1400|1450|WSC|Par Karlberg|32/32|
+116|002|MW|1500|1550|WSC|Par Karlberg|32/32|
+116|003|MW|1600|1650|WSC|Par Karlberg|32/32|
+116|004|TTh|1400|1450|WSC|Garren Craig|32/32|
+116|005|TTh|1500|1550|WSC|Garren Craig|32/32|
+116|006|TTh|1600|1650|WSC|Barney|32/32|
+116|007|TTh|1700|1750|WSC|Barney|32/32|
+116|009|TTh|1200|1250|WSC|Loren Smith|32/32|
+117|001|MW|1200|1250|WSC|Loren Smith|32/32|
+117|002|MW|1300|1350|WSC|Loren Smith|32/32|
+120|001|MW|1400|1550|TBA|Willis|25/25|1st
+120|002|TTh|1400|1550|TBA|Willis|25/25|1st
+120|003|TTh|1200|1350|TBA|Willis|25/25|2nd
+120|004|TTh|1400|1550|TBA|Willis|25/25|2nd
+121|001|MW|1700|1750|RB|Tahis Smith|25/25|
+121|002|MW|1800|1850|RB|Tahis Smith|25/25|
+125|001|MW|1000|1050|SFH|Maria Jenson|22/22|
+125|002|TTh|0900|0950|SFH|Cheney|22/22|
+125|003|TTh|1000|1050|SFH|Maria Jenson|22/22|
+125|004|online|||Online|Lindstrom|50/50|
+131|001|MW|0900|1050|SFLD/RB/GLFG||25/25|2nd
+131|002|MW|1400|1550|SFLD/RB/GLFG|Loren Smith|25/25|2nd
+131|003|TTh|1600|1750|SFLD/RB/GLFG|Beddoes|25/25|2nd
+131|004|online|||Online|Loren Smith|50/50|2nd
+132|001|MW|1600|1750|SFLD/RB/GLFG|Beddoes|30/30|2nd
+132|002|TTh|0900|1050|SFLD/RB/GLFG||30/30|2nd
+132|003|TTh|1400|1550|SFLD/RB/GLFG|Loren Smith|30/30|2nd
+132|004|online|||Online|Loren Smith|50/50|2nd
+136|001|MW|0900|0950|SFH|Pyne|26/26|
+136|002|MW|1000|1050|SFH|Pyne|26/26|
+136|003|MW|1100|1150|SFH|Pyne|26/26|
+136|004|TTh|0900|0950|SFH|Budd|26/26|
+136|005|TTh|1000|1050|SFH|Budd|26/26|
+139|001|MW|0800|0850|SFH/TRAK|Tahis Smith|30/30|
+139|002|MW|0900|0950|SFH/TRAK|Tahis Smith|30/30|
+139|003|TTh|0800|0850|SFH/TRAK|Sydney Rodriguez|30/30|
+139|004|online|||Online|Sydney Rodriguez|75/75|
+141|001|MW|0900|0950|IPF|Michael Pease|40/40|
+141|002|MW|1000|1050|IPF|Michael Pease|40/40|
+141|003|TTh|0800|0850|IPF|Michael Pease|40/40|
+141|004|TTh|0900|0950|IPF|Michael Pease|40/40|
+141|005|F|0900|1050|SFH|Michael Pease|30/30|
+146|001|MW|0800|0850|RB|Garren Craig|26/26|
+146|002|MW|0900|0950|RB|Garren Craig|26/26|
+146|003|MW|1000|1050|RB|Garren Craig|26/26|
+146|004|MW|1700|1750|RB|Jeremy King|28/28|
+147|001|MW|1600|1650|RB|Davidson|26/26|
+150|001|T|0900|1040|TBA|Willis|40/40|
+150|002|Th|0900|1040|TBA|Willis|40/40|
+150|003|Th|1100|1240|TBA|Willis|40/40|
+151|001|T|0900|1040|TBA|Willis|35/35|
+151|002|Th|0900|1040|TBA|Willis|35/35|
+151|003|Th|1100|1240|TBA|Willis|35/35|
+152|001|T|1230|1410|TBA|Willis|30/30|
+153|001|T|1230|1410|TBA|Willis|30/30|
+155|001|MW|0800|0850|IPF|Michael Pease|40/40|
+155|002|MW|1100|1150|IPF|Michael Pease|40/40|
+155|003|TTh|1000|1050|IPF|Michael Pease|40/40|
+155|004|F|1100|1250|SFH|Michael Pease|30/30|
+155|007|W|1900|2050|RB|Mauck|40/40|
+156|001|MW|0800|0850|IPF|Megan Mattei|36/36|
+156|002|MW|1000|1150|RBF|Par Karlberg|36/36|2nd
+157|001|MW|0800|0950|RBF|Par Karlberg|36/36|2nd
+157|002|TTh|0800|0850|IPF|Par Karlberg|36/36|
+157|004|TTh|0900|1050|RBF|Par Karlberg|36/36|2nd
+161|001|T|1330|1530|TBA|Willis|42/42|1st
+161|002|W|1330|1530|TBA|Willis|42/42|1st
+161|003|Th|1330|1530|TBA|Willis|42/42|1st
+162|001|T|1330|1530|TBA|Willis|30/30|1st
+162|002|W|1330|1530|TBA|Willis|30/30|1st
+162|003|Th|1330|1530|TBA|Willis|30/30|1st
+164|001|Th|1330|1530|TBA|Willis|18/18|1st
+170|001|MW|1000|1050|RB|Kelemen|20/20|
+171|001|MW|0900|0950|RB|Vaughan|26/26|
+171|002|MW|1100|1150|RB|Vaughan|26/26|
+171|003|TTh|1000|1050|RB|Tahis Smith|26/26|
+172|001|MW|1000|1050|RB|Vaughan|38/38|
+172|002|TTh|1300|1350|RB|Tahis Smith|38/38|
+175|001|T|1800|2150|SFH + dive site|Willis|28/28|1st
+175|002|W|1800|2150|SFH + dive site|Willis|28/28|1st
+175|003|Th|1800|2150|SFH + dive site|Willis|28/28|1st
+175|004|T|1800|2150|SFH + dive site|Willis|28/28|2nd
+175|005|W|1800|2150|SFH + dive site|Willis|28/28|2nd
+175|006|Th|1800|2150|SFH + dive site|Willis|28/28|2nd
+176|001|W|1800|2150|RB + dive site|Willis|28/28|1st
+179|001|TTh|1300|1350|RB|Kate Klingonsmith|30/30|
+181|001|MW|0900|1050|TCF/SFH|Tyler Aughenbaugh|35/35|2nd
+181|002|MW|1400|1550|TCF/SFH|Tyler Aughenbaugh|35/35|2nd
+181|003|TTh|1600|1750|TCF/TCB|Tyler Aughenbaugh|35/35|2nd
+181|004|online|||Online|Huntington|35/35|2nd
+182|001|MW|1100|1250|TCF/SFH|Tyler Aughenbaugh|35/35|2nd
+182|002|MW|1600|1750|TCF/TCB|Tyler Aughenbaugh|35/35|2nd
+182|003|TTh|1400|1550|TCF/SFH|Tyler Aughenbaugh|35/35|2nd
+182|004|online|||Online|Huntington|35/35|2nd
+186|001|MW|0800|0850|RB|Whiteside|42/42|
+186|002|MW|0900|0950|RB|Whiteside|42/42|
+186|003|TTh|1300|1350|RB|Par Karlberg|42/42|
+186|004|TTh|1400|1450|RB|Par Karlberg|42/42|
+186|005|TTh|1500|1550|RB|Par Karlberg|42/42|
+187|001|MW|1000|1050|RB|Marks|42/42|
+187|002|MW|1100|1150|RB|Marks|42/42|
+187|003|TTh|1600|1650|RB|Par Karlberg|42/42|
+187|004|TTh|1700|1750|RB|Huntington|42/42|
+187|005|F|0800|0950|RB|Marks|42/42|
+187|006|F|1000|1150|RB|Whiteside|42/42|
+187|007|F|1300|1450|RB|Jessie Dorathy|42/42|
+191|001|MW|0700|0750|SFH|Fry|30/30|
+191|002|MW|0800|0850|SFH|Fry|30/30|
+191|003|MW|0900|0950|SFH|Megan Mattei|30/30|
+191|004|MW|1000|1050|SFH|Audra Jeske|30/30|
+191|005|MW|1100|1150|SFH|Audra Jeske|30/30|
+191|006|MW|1200|1250|SFH|Welling|30/30|
+191|007|MW|1300|1350|SFH|Welling|30/30|
+191|008|MW|1400|1450|SFH|Welling|30/30|
+191|009|MW|1500|1550|SFH|Welling|30/30|
+191|010|MW|1600|1650|SFH|Bailey|30/30|
+191|011|MW|1700|1750|SFH|Bailey|30/30|
+191|012|TTh|0700|0750|SFH|Megan Mattei|30/30|
+191|013|TTh|0800|0850|SFH|Hyde|30/30|
+191|014|TTh|0900|0950|SFH|Martindale|30/30|
+191|015|TTh|1000|1050|SFH|Martindale|30/30|
+191|016|TTh|1200|1250|SFH|Audra Jeske|30/30|
+191|017|TTh|1300|1350|SFH|Jessie Dorathy|30/30|
+191|018|TTh|1400|1450|SFH|Jessie Dorathy|30/30|
+191|019|TTh|1500|1550|SFH|Jessie Dorathy|30/30|
+191|020|TTh|1600|1650|SFH|Welling|30/30|
+191|021|TTh|1700|1750|SFH|Welling|30/30|
+191|022|online|||Online|Lindstrom|75/75|`;
+
+// MBA: d = M T W R(Thu) F ; times in 24h "HH:MM"
+const toM=t=>{const [h,m]=t.split(":").map(Number);return h*60+m};
+const C = [
+ ["MBA515-1","Experience Design","Storey",3,"MW","14:00","15:15","1230 TNRB",30,""],
+ ["MBA522-1","Financial Modeling","Muirhead",3,"F","08:00","10:50","2325 TNRB",50,"2nd-year priority"],
+ ["MBA525-1","Financial Statement Analysis","Dyer",3,"MW","09:30","10:45","2401 TNRB",40,""],
+ ["MBA531-1","Sourcing and Logistics","Webb",3,"MW","12:30","13:45","2401 TNRB",40,""],
+ ["MBA535-1","Leadership and the Gospel","Bingham",3,"TR","14:00","15:15","2256 TNRB",80,""],
+ ["MBA535-2","Leadership and the Gospel","Bingham",3,"TR","12:30","13:45","2230 TNRB",28,""],
+ ["MBA536-1","Discipleship in Global Mgmt","Daniels",2,"MW","14:00","14:50","2240 TNRB",30,""],
+ ["MBA537-1","Change Management","Madsen",3,"TR","14:00","15:15","2325 TNRB",30,""],
+ ["MBA538-1","Advanced People Analytics","Gardner",3,"MW","12:30","13:45","1230 TNRB",35,""],
+ ["MBA546-1","Human Resource Mgt Skills","Reeves",3,"MW","14:00","15:15","1315 TNRB",44,""],
+ ["MBA553-1","Pricing Strategies","Howell",3,"MW","12:30","13:45","1315 TNRB",40,""],
+ ["MBA555-1","Marketing & Brand Consulting","Madden",3,"TR","15:30","16:45","1401 TNRB",12,"℀"],
+ ["MBA572-1","Entrepreneurial Analytics","Poulin",3,"MW","08:00","09:15","2240 TNRB",30,""],
+ ["MBA595-1","Razor's Edge: Leading/Thriving","Storey",3,"MW","11:00","12:15","3119 EJKB",15,"2nd-year priority"],
+ ["MBA595-2","Razor's Edge: Leading/Thriving","Widmer",3,"MW","09:30","10:45","3119 EJKB",15,"2nd-year priority"],
+ ["MBA609-1","Money, Fin Markets & Forecast","Wright",3,"MW","11:00","12:15","2240 TNRB",40,""],
+ ["MBA621-1","Advanced Corporate Finance","Nadauld",3,"MW","12:30","13:45","1258 TNRB",50,""],
+ ["MBA622-1","Investments","Boyer",3,"MW","14:00","15:15","1401 TNRB",45,""],
+ ["MBA634-1","Quality Management","Gardner",3,"MW","11:00","12:15","3113 JKB",39,"℀"],
+ ["MBA637A-1","GSCM Consulting 1","Brewer",3,"T","17:00","18:50","3319 TNRB",40,"1st-year priority ℀"],
+ ["MBA654-1","Strategic Client Acq/Retention","Cornilles",3,"M","15:30","18:15","1315 TNRB",24,""],
+ ["MBA658-1","International Marketing","Daniels",3,"MW","15:30","16:45","1321 TNRB",25,""],
+ ["MBA664-1","Venture Capital/Private Equity","Williams",3,"TR","14:00","15:15","2319 TNRB",36,"1st-year priority"],
+ ["MBA673-1","Product Management","Wudel",3,"MW","09:30","10:45","1401 TNRB",45,""],
+ ["MBA675-1","Corporate Social Strategy","Ellsworth",3,"TR","17:00","18:15","2270 TNRB",35,""],
+ ["MBA676R-1","New Venture Launchpad","Hendron",3,"W","15:30","16:45","2156 TNRB",35,"℀"],
+ ["MBA677R-1","Entrepreneurship Thru Acquisition","Peterson",3,"MW","09:30","10:45","1439 TNRB",36,""],
+ ["MBA678-1","Venture Studio Practicum","Peterson",3,"MW","14:00","15:15","270 MCKB",20,""],
+ ["MBA682-1","Strategy Lessons from History","Hansen",3,"MW","15:30","16:45","1216 TNRB",30,""],
+ ["MBA684A-1","Advanced Strategy & Consulting","Godfrey",3,"TR","15:30","16:45","1140 TNRB",35,"1st-year priority ℀"],
+ ["MBA691-1","Real Estate Development","Peterson",3,"MW","11:00","12:15","3128 TNRB",28,""],
+ ["MBA692-1","Social Impact","Christensen",3,"TR","14:00","15:15","2220 TNRB",8,"℀"],
+ ["MBA692-2","Social Impact","Miller",3,"MW","15:30","16:45","3319 TNRB",4,"℀"],
+ ["MBA692-3","Social Impact","Fox",3,"MW","14:00","15:15","2140 TNRB",4,"℀"],
+ ["MBA692-4","Social Impact","Heist",3,"TR","15:30","16:45","1106 TNRB",5,"℀"],
+ ["MBA693R-10","Special Topics: Advanced Strategy Analytics","Hall",3,"TR","15:30","16:45","1020 JKB",45,""],
+ ["MBA693R-11","Special Topics: Leadership Coaching & Mentoring","Howell",1.5,"W","11:00","12:15","2124 TNRB",24,""],
+ ["MBA693R-20","Special Topics: Corporate Social Impact Internship","Piacitelli",3,"TR","15:30","16:45","2106 TNRB",10,""],
+ ["MBA693R-5","Special Topics: Corporate Social Impact Internship","Witesman",3,"TR","15:30","16:45","1315 TNRB",10,""],
+ ["MBA693R-6","Special Topics: Storytelling with Data","Alleger",3,"MW","11:00","12:15","1321 TNRB",30,""],
+ ["MBA693R-8","Special Topics: Growing & Scaling New Ventures","Boyce",3,"MW","17:00","18:50","1106 TNRB",35,""]
+].map((r,i)=>({id:i,kind:"mba",code:r[0],name:r[1],prof:r[2],cr:r[3],days:r[4],s:toM(r[5]),e:toM(r[6]),room:r[7],seats:r[8],note:r[9],blk:"",online:false}));
+
+// SWELL sections -> same shape as MBA sections (ids start at 1000)
+const DMAP={M:"M",T:"T",W:"W",Th:"R",F:"F",MW:"MW",TTh:"TR"};
+const hm=n=>Math.floor(n/100)*60+n%100;
+const S=RAW.trim().split("\n").map((l,i)=>{
+  const [c,sec,d,st,en,b,ins,seat,blk]=l.split("|");
+  const [open,size]=seat.split("/").map(Number);
+  const online=d==="online";
+  return {id:1000+i,kind:"swell",num:c,sec,key:c+"-"+sec,code:"SWELL "+c+"-"+sec,name:TITLES[c],prof:ins,cr:0.5,
+    days:online?"":DMAP[d],online,s:online?null:hm(+st),e:online?null:hm(+en),room:b,open,seats:size,blk:blk||""};
+});
+const A=id=>id<1000?C[id]:S[id-1000];
+
+const DN={M:"Mon",T:"Tue",W:"Wed",R:"Thu",F:"Fri"};
+const DORDER="MTWRF";
+const fmt=m=>{let h=Math.floor(m/60);const mm=m%60;const ap=h>=12?"pm":"am";h=h%12||12;return h+":"+String(mm).padStart(2,"0")+ap};
+const pat=c=>c.days==="MW"?"Mon/Wed":c.days==="TR"?"Tue/Thu":DN[c.days]||c.days;
+const timeStr=c=>c.online?"Online (no set time)":pat(c)+" "+fmt(c.s)+"–"+fmt(c.e);
+const dayRank=c=>c.online?9:Math.min(...[...c.days].map(d=>DORDER.indexOf(d)));
+const blkOk=(a,b)=>a.blk===""||b.blk===""||a.blk===b.blk;
+const overlap=(a,b)=>a.id!==b.id&&!a.online&&!b.online&&[...a.days].some(d=>b.days.includes(d))&&a.s<b.e&&b.s<a.e&&blkOk(a,b);
+C.forEach(c=>c.over=C.filter(o=>overlap(c,o)));
+C.forEach(c=>c.alts=C.filter(o=>o.id!==c.id&&o.code.split("-")[0]===c.code.split("-")[0]&&o.name===c.name));
+
+let sel=new Set();
+try{const v=JSON.parse(localStorage.getItem("mba-sel")||"[]");if(Array.isArray(v))v.forEach(i=>{if(C[i])sel.add(i)})}catch(e){}
+try{const v=JSON.parse(localStorage.getItem("swell-sel")||"[]");if(Array.isArray(v))v.forEach(k=>{const x=S.find(s=>s.key===k);if(x)sel.add(x.id)})}catch(e){}
+const save=()=>{
+  try{localStorage.setItem("mba-sel",JSON.stringify([...sel].filter(i=>i<1000)))}catch(e){}
+  try{localStorage.setItem("swell-sel",JSON.stringify([...sel].filter(i=>i>=1000).map(i=>A(i).key)))}catch(e){}
+};
+
+let tab="all",q="",dayF="",sortK="time",sortDir=1,hideFull=false,focusId=null,open=new Set();
+// SWELL tab state
+let swQ="",swDay="",swAfter="",swBefore="",swBlock="",swOnline=true,swShowConf=false,actState={},autoOpen=true;
+
+const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+const selItems=()=>[...sel].map(A);
+const clashIds=()=>{const s=new Set();const it=selItems();it.forEach(a=>it.forEach(b=>{if(a!==b&&overlap(a,b)){s.add(a.id);s.add(b.id)}}));return s};
+const pairsOf=items=>{const p=[];items.forEach((a,i)=>items.slice(i+1).forEach(b=>{if(overlap(a,b))p.push([a,b])}));return p};
+const conflictsOf=x=>selItems().filter(o=>overlap(o,x));
+const fits=x=>!selItems().some(o=>overlap(o,x));
+const lbl=c=>c.code+" "+c.name;
+// 1st year core classes (Tue/Thu): 8:00-9:15, 9:30-10:45, 12:30-1:45
+const CORE=[[480,555],[570,645],[750,825]];
+const coreHit=x=>!x.online&&(x.days.includes("T")||x.days.includes("R"))&&CORE.some(([s,e])=>x.s<e&&s<x.e);
+const coreTag=x=>coreHit(x)?`<span class="tag warn">Conflicts with 1st year core classes</span>`:"";
+const mbaSame=x=>x.online?[]:C.filter(c=>overlap(c,x));
+const blkTxt=b=>b==="1st"?"1st block · Jan 6–Feb 24":b==="2nd"?"2nd block · Feb 25–Apr 14":"";
+const fmtCr=n=>Number.isInteger(n)?String(n):n.toFixed(1);
+
+function sorted(list){
+  const k={time:c=>[dayRank(c),c.online?0:c.s],
+    code:c=>c.code,name:c=>c.name,prof:c=>c.prof,seats:c=>c.seats};
+  const f=k[sortK];
+  return [...list].sort((a,b)=>{
+    const x=f(a),y=f(b);
+    if(Array.isArray(x)){return ((x[0]-y[0])||(x[1]-y[1])||a.code.localeCompare(b.code))*sortDir}
+    return (x>y?1:x<y?-1:a.code.localeCompare(b.code))*sortDir});
+}
+
+function filtered(){
+  const t=q.toLowerCase();
+  return C.filter(c=>(!t||(c.code+c.name+c.prof+c.room).toLowerCase().includes(t))
+    &&(!dayF||c.days.includes(dayF))&&(!hideFull||c.seats>=10));
+}
+
+function rowHTML(c,cl){
+  const on=sel.has(c.id);
+  const ov=c.over.length;
+  return `<tr class="${on?"sel":""} ${cl.has(c.id)?"clash":""}" id="r${c.id}">
+    <td><span class="code">${esc(c.code)}</span></td>
+    <td>${esc(c.name)}<div class="sub">${esc(c.room)} · ${c.cr} cr · ${c.seats} seats</div>
+      ${c.note?c.note.split(/ (?=℀)/).map(n=>`<span class="tag">${esc(n)}</span>`).join(""):""}${coreTag(c)}</td>
+    <td>${esc(c.prof)}</td>
+    <td class="time">${esc(timeStr(c))}</td>
+    <td>${ov?`<button class="ovl" data-ov="${c.id}" aria-expanded="${open.has(c.id)}">${ov} overlap${ov>1?"s":""} ${open.has(c.id)?"▴":"▾"}</button>`:`<span class="none">none</span>`}</td>
+    <td><button class="add" data-add="${c.id}" aria-pressed="${on}">${on?"Added":"Add"}</button></td></tr>`+(open.has(c.id)?detailHTML(c):"");
+}
+
+function detailHTML(c){
+  const mini=(o,extra)=>`<li><span class="code" style="min-width:84px">${esc(o.code)}</span><span class="nm">${esc(o.name)}<div class="sub">${esc(o.prof)} · ${esc(timeStr(o))} · ${o.seats} seats</div>${coreTag(o)}${extra||""}</span><button class="add" data-add="${o.id}" aria-pressed="${sel.has(o.id)}">${sel.has(o.id)?"Added":"Add"}</button></li>`;
+  const overSet=new Set(c.over.map(o=>o.id));
+  const alt=a=>{
+    const sameBlock=overlap(a,c);
+    const shared=a.over.filter(o=>overSet.has(o.id)).length;
+    const mine=selItems().some(o=>o.id!==a.id&&o.id!==c.id&&overlap(o,a));
+    let tag;
+    if(sameBlock)tag=`<span class="tag warn">Same time block</span>`;
+    else if(shared)tag=`<span class="tag warn">Different time, still overlaps ${shared} of these</span>`;
+    else tag=`<span class="tag ok">Avoids this block</span>`;
+    if(mine)tag+=`<span class="tag warn">Conflicts with your schedule</span>`;
+    return mini(a,tag);
+  };
+  return `<tr class="detail"><td colspan="6"><div class="dbox">
+    <div class="dcol"><h4>Overlaps with ${c.over.length} section${c.over.length>1?"s":""}</h4><ul class="mini">${c.over.map(o=>mini(o)).join("")}</ul></div>
+    <div class="dcol"><h4>Other sections of ${esc(c.name)}</h4>${c.alts.length?`<ul class="mini">${c.alts.map(alt).join("")}</ul>`:`<div class="sub">Only one section of this class is offered, so there is no way around this block.</div>`}</div>
+    <div class="dfoot"><button class="ovl" data-focus="${c.id}">See more</button><button class="ovl" data-ov="${c.id}">Close</button></div>
+  </div></td></tr>`;
+}
+
+function allView(){
+  const cl=clashIds();
+  let list=sorted(filtered());
+  let focusNote="";
+  if(focusId!==null){
+    const f=C[focusId];
+    list=sorted([f,...f.over]);
+    focusNote=`<div class="note">Showing <b>${esc(f.code)} ${esc(f.name)}</b> (${esc(timeStr(f))}) and the ${f.over.length} section${f.over.length>1?"s":""} that overlap it. <button class="ovl" data-clearfocus="1">Show all classes</button></div>`;
+  }
+  const th=(k,l)=>`<th data-sort="${k}">${l}${sortK===k?(sortDir>0?" ▲":" ▼"):""}</th>`;
+  return `${focusNote}
+  <div class="controls">
+    <input type="search" id="q" placeholder="Search code, name, professor, room" value="${esc(q)}" aria-label="Search classes">
+    <select id="day" aria-label="Filter by day">
+      <option value="">All days</option>
+      ${[...DORDER].map(d=>`<option value="${d}" ${dayF===d?"selected":""}>${DN[d]}</option>`).join("")}
+    </select>
+    <label class="chk"><input type="checkbox" id="full" ${hideFull?"checked":""}> Hide sections under 10 seats</label>
+    <span class="sub">${list.length} of ${C.length} shown</span>
+  </div>
+  <div class="tablewrap"><table>
+    <thead><tr>${th("code","Code")}${th("name","Class")}${th("prof","Professor")}${th("time","Time")}<th style="cursor:default">Same time as</th><th style="cursor:default"></th></tr></thead>
+    <tbody>${list.length?list.map(c=>rowHTML(c,cl)).join(""):`<tr><td colspan="6" class="empty">No classes match those filters.</td></tr>`}</tbody>
+  </table></div>
+  <div class="legend"><span><span class="dot" style="background:var(--accent-soft);border:1px solid var(--accent)"></span>Added</span>
+  <span><span class="dot" style="background:var(--warn)"></span>Added and conflicting</span>
+  <span>℀ symbol is copied from your list (likely a special-enrollment flag); check the course catalog for its meaning.</span></div>`;
+}
+
+function slotsView(){
+  const groups={};
+  C.forEach(c=>{const k=c.days+"|"+c.s+"|"+c.e;(groups[k]=groups[k]||[]).push(c)});
+  const keys=Object.keys(groups).sort((a,b)=>{
+    const [da,sa]=a.split("|"),[db,sb]=b.split("|");
+    const o=x=>Math.min(...[...x].map(d=>DORDER.indexOf(d)));
+    return (o(da)-o(db))||(+sa-+sb)||a.localeCompare(b)});
+  let html=`<div class="note">Each box is one exact meeting time. Classes in the same box directly conflict. Classes that only partly overlap (for example a 2:00–2:50 class and a 2:00–3:15 class) are marked in the "Same time as" column on the MBA classes tab.</div>`;
+  let lastDay="";
+  keys.forEach(k=>{
+    const g=groups[k],c0=g[0];
+    if(c0.days!==lastDay){lastDay=c0.days;html+=`<h2 class="daytitle">${pat(c0)}</h2>`}
+    html+=`<div class="group"><h3>${fmt(c0.s)}–${fmt(c0.e)}<span>${g.length} section${g.length>1?"s":""}</span></h3><ul>`+
+      g.map(c=>`<li><span class="code" style="min-width:92px">${esc(c.code)}</span><span class="nm">${esc(c.name)}<div class="sub">${esc(c.prof)} · ${esc(c.room)}</div>${coreTag(c)}</span>
+      <button class="add" data-add="${c.id}" aria-pressed="${sel.has(c.id)}">${sel.has(c.id)?"Added":"Add"}</button></li>`).join("")+`</ul></div>`;
+  });
+  return html;
+}
+
+// Side-by-side lanes for events that share time on the same day
+function layout(evs){
+  evs.sort((a,b)=>a.s-b.s||a.e-b.e);
+  const out=[];let cluster=[],cEnd=-1;
+  const flush=()=>{
+    if(!cluster.length)return;
+    const lanes=[];
+    cluster.forEach(ev=>{let l=lanes.findIndex(end=>end<=ev.s);if(l<0){l=lanes.length;lanes.push(0)}lanes[l]=ev.e;ev.lane=l});
+    cluster.forEach(ev=>ev.n=lanes.length);
+    out.push(...cluster);cluster=[];
+  };
+  evs.forEach(ev=>{
+    if(cluster.length&&ev.s>=cEnd){flush();cEnd=-1}
+    cluster.push(ev);cEnd=Math.max(cEnd,ev.e);
+  });
+  flush();return out;
+}
+
+function conflictNote(pairs,summary){
+  return `<div class="note warn"><b>${pairs.length} conflict${pairs.length>1?"s":""}:</b><ul style="margin:6px 0 0;padding-left:18px">${pairs.map(([a,b])=>`<li>${esc(lbl(a))} (${esc(timeStr(a))}) overlaps ${esc(lbl(b))} (${esc(timeStr(b))})</li>`).join("")}</ul></div>${summary?`<div class="sub" style="margin-bottom:8px">${summary}</div>`:""}`;
+}
+
+function mineView(){
+  if(!sel.size)return `<div class="note empty">No classes added yet. Use the Add buttons on the MBA classes tab and your week will appear here. Once your MBA classes are in, the SWELL classes tab shows activities that fit around them.</div>`;
+  const items=selItems();
+  const mba=items.filter(x=>x.kind==="mba"),sw=items.filter(x=>x.kind==="swell");
+  const cl=clashIds();
+  const pairs=pairsOf(items);
+  const mcr=mba.reduce((s,c)=>s+c.cr,0),scr=sw.length*0.5;
+  const summary=`${mba.length} MBA class${mba.length===1?"":"es"} (${fmtCr(mcr)} credit hours)`+(sw.length?` + ${sw.length} SWELL (${fmtCr(scr)} credit hours)`:"");
+  let html=pairs.length?conflictNote(pairs,summary):`<div class="note ok"><b>No conflicts.</b> ${summary}.</div>`;
+  const timed=items.filter(x=>!x.online);
+  const START=Math.min(480,...timed.map(x=>Math.floor(x.s/60)*60)),END=Math.max(1140,...timed.map(x=>Math.ceil(x.e/60)*60)),PX=0.9;
+  const H=(END-START)*PX,NH=(END-START)/60;
+  let cols="";
+  [..."MTWRF"].forEach(d=>{
+    const evs=layout(timed.filter(c=>c.days.includes(d)).map(c=>({c,s:c.s,e:c.e})));
+    cols+=`<div class="col" style="height:${H}px">`+
+      Array.from({length:NH},(_,i)=>`<div class="hr" style="top:${i*60*PX}px"></div>`).join("")+
+      evs.map(({c,lane,n})=>{
+        const w=100/n;
+        const second=c.kind==="swell"?`${fmt(c.s)}–${fmt(c.e)}${c.blk?" · "+c.blk+" blk":""}`:`${fmt(c.s)}–${fmt(c.e)}`;
+        const head=c.kind==="swell"?`<b>${esc(c.name)}</b>`:`<b>${esc(c.code)}</b>${esc(c.name)}<br>`;
+        return `<div class="ev ${c.kind==="swell"?"sw":""} ${cl.has(c.id)?"clash":""}" title="${esc(lbl(c))}" style="top:${(c.s-START)*PX}px;height:${(c.e-c.s)*PX-2}px;left:calc(${lane*w}% + 1px);width:calc(${w}% - 2px)">${head}${second}</div>`}).join("")+`</div>`;
+  });
+  const tc=`<div class="timecol" style="height:${H}px">`+Array.from({length:NH},(_,i)=>{const h=START/60+i;return `<div class="hr" style="top:${i*60*PX}px">${h%12||12}${h>=12?"p":"a"}</div>`}).join("")+`</div>`;
+  html+=`<div class="gwrap"><div class="grid"><div class="gh"></div>${[..."MTWRF"].map(d=>`<div class="gh">${DN[d]}</div>`).join("")}${tc}${cols}</div></div>`;
+  html+=`<div class="legend"><span><span class="dot" style="background:var(--accent-soft);border:1px solid var(--accent)"></span>MBA</span><span><span class="dot" style="background:var(--ok-soft);border:1px solid var(--ok)"></span>SWELL</span><span><span class="dot" style="background:var(--warn-soft);border:1px solid var(--warn)"></span>Conflict</span>`+
+    (mba.length?`<button class="ovl go" data-tab="fill">Find SWELL for your open time</button>`:"")+
+    (sw.length?`<button class="clear" data-clearsw="1" style="margin-left:auto">Remove all SWELL</button><button class="clear" style="margin-left:0" data-clearall="1">Remove all</button>`:`<button class="clear" data-clearall="1">Remove all</button>`)+`</div>`;
+  if(sw.some(x=>x.online))html+=`<div class="sub" style="margin-bottom:8px">Online SWELL sections have no set meeting time, so they are listed below but not drawn on the week.</div>`;
+  const th=`<th style="cursor:default">Code</th><th style="cursor:default">Class</th><th style="cursor:default">Professor</th><th style="cursor:default">Time</th><th style="cursor:default"></th>`;
+  const row=c=>`<tr class="${cl.has(c.id)?"clash":""}"><td class="code">${esc(c.code)}</td><td>${esc(c.name)}<div class="sub">${esc(c.kind==="swell"?swWhere(c):c.room)}</div>${c.blk?`<span class="tag">${esc(blkTxt(c.blk))}</span>`:""}${coreTag(c)}</td><td>${esc(c.prof||"TBA")}</td><td class="time">${esc(timeStr(c))}</td><td><button class="add ${c.kind==="swell"?"sw":""}" data-add="${c.id}" aria-pressed="true">Remove</button></td></tr>`;
+  if(mba.length)html+=`<div class="tablewrap"><table><thead><tr>${th}</tr></thead><tbody>${sorted(mba).map(row).join("")}</tbody></table></div>`;
+  if(sw.length)html+=`<h2 class="daytitle">SWELL</h2><div class="tablewrap"><table><thead><tr>${th}</tr></thead><tbody>${sorted(sw).map(row).join("")}</tbody></table></div>`;
+  return html;
+}
+
+// ---------- SWELL: fill free time ----------
+const swWhere=x=>x.room==="TBA"?"Off campus (location TBA)":x.room;
+const DAY_S=420,DAY_E=1080; // open windows are looked for between 7am and 6pm
+function gapsFor(d){
+  const busy=selItems().filter(x=>!x.online&&x.days.includes(d)).map(x=>[x.s,x.e]).sort((a,b)=>a[0]-b[0]);
+  const out=[];let cur=DAY_S;
+  busy.forEach(([s,e])=>{const end=Math.min(s,DAY_E);if(end-cur>=50)out.push([cur,end]);cur=Math.max(cur,e)});
+  if(DAY_E-cur>=50)out.push([cur,DAY_E]);
+  return out;
+}
+function swBase(){
+  const t=swQ.toLowerCase();
+  return S.filter(x=>{
+    if(t&&!(x.code+" "+x.name+" "+x.prof+" "+x.room).toLowerCase().includes(t))return false;
+    if(x.online){
+      if(swAfter!==""||swBefore!=="")return false;
+      if(!(swDay==="online"||(swOnline&&swDay==="")))return false;
+    }else{
+      if(swDay==="online")return false;
+      if(swDay&&!x.days.includes(swDay))return false;
+      if(swAfter!==""&&x.s<swAfter)return false;
+      if(swBefore!==""&&x.e>swBefore)return false;
+    }
+    if(swBlock&&(swBlock==="full"?x.blk!=="":x.blk!==swBlock))return false;
+    return true;
+  });
+}
+const timeOpts=(val,anyLabel)=>{
+  const set=new Set();for(let m=360;m<=1320;m+=30)set.add(m);if(val!=="")set.add(val);
+  return `<option value="">${anyLabel}</option>`+[...set].sort((a,b)=>a-b).map(m=>`<option value="${m}" ${val===m?"selected":""}>${fmt(m)}</option>`).join("");
+};
+const isOpenAct=k=>k in actState?actState[k]:autoOpen;
+
+function swRow(x){
+  const on=sel.has(x.id);
+  const cf=conflictsOf(x);
+  const m=mbaSame(x);
+  const shownM=m.slice(0,3).map(c=>esc(c.code+" "+c.name)).join("; ");
+  const moreM=m.length>3?` <span title="${esc(m.slice(3).map(c=>c.code+" "+c.name).join("; "))}">+${m.length-3} more: ${esc(m.slice(3).map(c=>c.code).join(", "))}</span>`:"";
+  const mbaNote=x.online?"":m.length?`<div class="sub">Same time as MBA: ${shownM}${moreM}</div>`:`<div class="sub">No MBA class meets at this time</div>`;
+  const seats=x.open<=0?`<span class="tag warn">Full</span>`:`${x.open}/${x.seats} seats`;
+  return `<li class="${on?"sel":""}"><span class="code" style="min-width:48px">${esc(x.sec)}</span>
+    <span class="nm">${esc(timeStr(x))}<div class="sub">${esc(x.online?"Online":swWhere(x))} · ${esc(x.prof||"Instructor TBA")} · ${seats}</div>${mbaNote}
+    ${coreTag(x)}${x.blk?`<span class="tag">${esc(blkTxt(x.blk))}</span>`:""}${cf.length?`<span class="tag warn">Conflicts with ${esc(cf.map(o=>o.code).join(", "))}</span>`:""}</span>
+    <button class="add sw" data-add="${x.id}" aria-pressed="${on}">${on?"Added":"Add"}</button></li>`;
+}
+
+function fillView(){
+  const items=selItems();
+  const mba=items.filter(x=>x.kind==="mba"),sw=items.filter(x=>x.kind==="swell");
+  const pairs=pairsOf(items);
+  let html="";
+  if(pairs.length)html+=conflictNote(pairs,"");
+  if(!mba.length){
+    html+=`<div class="note"><b>Add your MBA classes first.</b> This tab then shows only SWELL sections that fit around them. Nothing is blocked yet, so every section is listed.</div>`;
+  }else{
+    const rows=[..."MTWRF"].map(d=>{
+      const g=gapsFor(d);
+      return `<div class="gaprow"><span class="d">${DN[d]}</span>${g.length?g.map(([s,e])=>{const on=swDay===d&&swAfter===s&&swBefore===e;return `<button class="chip" data-gap="${d}|${s}|${e}" aria-pressed="${on}">${fmt(s)}–${fmt(e)}</button>`}).join(""):`<span class="sub">no open time</span>`}</div>`}).join("");
+    html+=`<div class="note"><b>Open time in your week</b> (7am–6pm, 50 minutes or longer). Tap a window to list only the SWELL sections that fit inside it.<div class="gaps">${rows}</div></div>`;
+  }
+  const base=swBase();
+  const fitting=base.filter(x=>sel.has(x.id)||fits(x));
+  const hidden=base.length-fitting.length;
+  const shown=swShowConf?base:fitting;
+  autoOpen=shown.length<=30;
+  const byAct={};
+  shown.forEach(x=>(byAct[x.num]=byAct[x.num]||[]).push(x));
+  const acts=Object.keys(byAct).sort((a,b)=>TITLES[a].localeCompare(TITLES[b]));
+  const filt=swDay||swAfter!==""||swBefore!==""||swBlock||swQ||!swOnline||swShowConf;
+  html+=`<div class="controls">
+    <input type="search" id="swq" placeholder="Search activity, instructor, building" value="${esc(swQ)}" aria-label="Search SWELL activities">
+    <label class="fl">Day <select id="swday"><option value="">Any</option>${[...DORDER].map(d=>`<option value="${d}" ${swDay===d?"selected":""}>${DN[d]}</option>`).join("")}<option value="online" ${swDay==="online"?"selected":""}>Online only</option></select></label>
+    <label class="fl">From <select id="swafter">${timeOpts(swAfter,"Any")}</select></label>
+    <label class="fl">Until <select id="swbefore">${timeOpts(swBefore,"Any")}</select></label>
+    <label class="fl">Dates <select id="swblock"><option value="">Any</option><option value="full" ${swBlock==="full"?"selected":""}>Full semester</option><option value="1st" ${swBlock==="1st"?"selected":""}>1st block</option><option value="2nd" ${swBlock==="2nd"?"selected":""}>2nd block</option></select></label>
+  </div>
+  <div class="controls">
+    <label class="chk"><input type="checkbox" id="swonline" ${swOnline?"checked":""}> Include online sections</label>
+    <label class="chk"><input type="checkbox" id="swconf" ${swShowConf?"checked":""}> Also show sections that conflict${hidden&&!swShowConf?` (${hidden} hidden)`:""}</label>
+    ${filt?`<button class="clear" style="margin-left:0" data-swreset="1">Clear filters</button>`:""}
+    <span class="sub" style="margin-left:auto">${shown.length} section${shown.length===1?"":"s"} in ${acts.length} activit${acts.length===1?"y":"ies"}${sw.length?` · ${sw.length} added (${fmtCr(sw.length*0.5)} cr)`:""}</span>
+  </div>`;
+  if(!acts.length){
+    html+=`<div class="note empty">No SWELL sections fit those filters. Try a wider time window${hidden?`, or turn on "Also show sections that conflict"`:""}.</div>`;
+  }else{
+    html+=acts.map(k=>{
+      const g=byAct[k].sort((a,b)=>dayRank(a)-dayRank(b)||(a.online?0:a.s)-(b.online?0:b.s)||a.sec.localeCompare(b.sec));
+      const o=isOpenAct(k),nAdd=g.filter(x=>sel.has(x.id)).length;
+      return `<div class="group sw"><h3><button class="acthd" data-act="${k}" aria-expanded="${o}">${o?"▾":"▸"} ${esc(TITLES[k])}<span class="sub">SWELL ${k}</span></button><span>${nAdd?`${nAdd} added · `:""}${g.length} section${g.length>1?"s":""}</span></h3>${o?`<ul>${g.map(swRow).join("")}</ul>`:""}</div>`}).join("");
+  }
+  html+=`<div class="note"><b>Notes.</b> Every SWELL section is 0.5 credit. Semester runs Jan 6 – Apr 14, 2027; 1st block is Jan 6–Feb 24 and 2nd block is Feb 25–Apr 14, so a 1st-block and a 2nd-block section can share a time slot. MBA classes are treated as running the full semester. Buildings: RB Richards · SFH Smith Fieldhouse · WSC Wilkinson Student Center · IPF Indoor Practice Facility · RBF/NUF fields · TCF/TCB tennis · SFLD/GLFG golf. Scuba meets for a 6:00pm classroom hour, then a pool or dive session 8:00–9:50pm; it is shown here as one block. Seat counts are from Oct 9, 2026, so check MyMAP before you register.</div>`;
+  return html;
+}
+
+function render(keepFocus){
+  document.getElementById("cnt").textContent=sel.size;
+  document.getElementById("cntsw").textContent=[...sel].filter(i=>i>=1000).length;
+  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.tab===tab));
+  const v=document.getElementById("view");
+  v.innerHTML=tab==="all"?allView():tab==="slots"?slotsView():tab==="fill"?fillView():mineView();
+  if(keepFocus){const el=document.getElementById(tab==="fill"?"swq":"q");const len=tab==="fill"?swQ.length:q.length;if(el){el.focus();el.setSelectionRange(len,len)}}
+}
+
+const keepY=fn=>{const y=window.scrollY;fn();render();window.scrollTo(0,y)};
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-tab],[data-add],[data-sort],[data-ov],[data-focus],[data-clearfocus],[data-clearall],[data-clearsw],[data-gap],[data-act],[data-swreset]");
+  if(!t)return;
+  if(t.dataset.tab){tab=t.dataset.tab;render();window.scrollTo(0,0)}
+  else if(t.dataset.add!==undefined){const i=+t.dataset.add;keepY(()=>{sel.has(i)?sel.delete(i):sel.add(i);save()})}
+  else if(t.dataset.sort){const k=t.dataset.sort;if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=1}render()}
+  else if(t.dataset.ov){const i=+t.dataset.ov;keepY(()=>{open.has(i)?open.delete(i):open.add(i)})}
+  else if(t.dataset.focus){focusId=+t.dataset.focus;open.clear();render();window.scrollTo(0,0)}
+  else if(t.dataset.clearfocus){focusId=null;render()}
+  else if(t.dataset.clearall){sel.clear();save();render()}
+  else if(t.dataset.clearsw){[...sel].filter(i=>i>=1000).forEach(i=>sel.delete(i));save();render()}
+  else if(t.dataset.gap){const [d,s,en]=t.dataset.gap.split("|");
+    if(swDay===d&&swAfter===+s&&swBefore===+en){swDay="";swAfter="";swBefore=""}else{swDay=d;swAfter=+s;swBefore=+en}render()}
+  else if(t.dataset.act){const k=t.dataset.act;keepY(()=>{actState[k]=!isOpenAct(k)})}
+  else if(t.dataset.swreset){swQ="";swDay="";swAfter="";swBefore="";swBlock="";swOnline=true;swShowConf=false;render()}
+});
+document.addEventListener("input",e=>{
+  if(e.target.id==="q"){q=e.target.value;focusId=null;render(true)}
+  if(e.target.id==="swq"){swQ=e.target.value;render(true)}
+});
+document.addEventListener("change",e=>{
+  const id=e.target.id,v=e.target.value;
+  if(id==="day"){dayF=v;focusId=null;render()}
+  if(id==="full"){hideFull=e.target.checked;render()}
+  if(id==="swday"){swDay=v;render()}
+  if(id==="swafter"){swAfter=v===""?"":+v;render()}
+  if(id==="swbefore"){swBefore=v===""?"":+v;render()}
+  if(id==="swblock"){swBlock=v;render()}
+  if(id==="swonline"){swOnline=e.target.checked;render()}
+  if(id==="swconf"){swShowConf=e.target.checked;render()}
+});
+render();
+</script>
+</body>
+</html>
