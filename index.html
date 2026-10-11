@@ -106,6 +106,9 @@ ul.mini .nm{flex:1;min-width:160px}
 .chip{border:1px solid var(--ok);background:transparent;color:var(--ok);border-radius:999px;padding:2px 10px;font:inherit;font-size:13px;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--ok);color:var(--panel)}
 .fl{display:flex;gap:6px;align-items:center;color:var(--muted);font-size:13px}
+.lnk{border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font:inherit;font-size:12px;padding:2px 0}
+tr.done td{opacity:.55}
+.group.dn{opacity:.6}
 </style>
 </head>
 <body>
@@ -113,6 +116,7 @@ ul.mini .nm{flex:1;min-width:160px}
   <h1>Winter 2027 schedule planner</h1>
   <p>Pick your MBA classes first. Then open <b>SWELL classes</b> to see only the SWELL activities that fit around them.</p>
   <p style="margin-top:6px">Sections tagged <span class="tag warn" style="margin:0">Conflicts with 1st year core classes</span> overlap the 1st year core schedule (Tue/Thu 8:00–9:15, 9:30–10:45 and 12:30–1:45).</p>
+  <p style="margin-top:6px">Already taken a class? Click <b>Mark completed</b> on it. It then disappears from the lists and from the overlap warnings.</p>
 </header>
 <div class="wrap">
   <div class="tabs" role="tablist">
@@ -382,9 +386,17 @@ const overlap=(a,b)=>a.id!==b.id&&!a.online&&!b.online&&[...a.days].some(d=>b.da
 C.forEach(c=>c.over=C.filter(o=>overlap(c,o)));
 C.forEach(c=>c.alts=C.filter(o=>o.id!==c.id&&o.code.split("-")[0]===c.code.split("-")[0]&&o.name===c.name));
 
+const doneKey=x=>x.kind==="swell"?"s:"+x.num:"m:"+x.code.split("-")[0]+"|"+x.name;
+let done=new Set();
+try{const v=JSON.parse(localStorage.getItem("done-keys")||"[]");if(Array.isArray(v))v.forEach(k=>done.add(k))}catch(e){}
+const saveDone=()=>{try{localStorage.setItem("done-keys",JSON.stringify([...done]))}catch(e){}};
+const isDone=x=>done.has(doneKey(x));
+const vis=x=>showDone||!isDone(x);
+const overOf=c=>c.over.filter(o=>!isDone(o));
 let sel=new Set();
 try{const v=JSON.parse(localStorage.getItem("mba-sel")||"[]");if(Array.isArray(v))v.forEach(i=>{if(C[i])sel.add(i)})}catch(e){}
 try{const v=JSON.parse(localStorage.getItem("swell-sel")||"[]");if(Array.isArray(v))v.forEach(k=>{const x=S.find(s=>s.key===k);if(x)sel.add(x.id)})}catch(e){}
+[...sel].forEach(i=>{if(isDone(A(i)))sel.delete(i)});
 const save=()=>{
   try{localStorage.setItem("mba-sel",JSON.stringify([...sel].filter(i=>i<1000)))}catch(e){}
   try{localStorage.setItem("swell-sel",JSON.stringify([...sel].filter(i=>i>=1000).map(i=>A(i).key)))}catch(e){}
@@ -392,6 +404,7 @@ const save=()=>{
 
 let tab="all",q="",dayF="",sortK="time",sortDir=1,hideFull=false,focusId=null,open=new Set();
 // SWELL tab state
+let showDone=false;
 let swQ="",swDay="",swAfter="",swBefore="",swBlock="",swOnline=true,swShowConf=false,actState={},autoOpen=true;
 
 const esc=s=>String(s).replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
@@ -405,7 +418,8 @@ const lbl=c=>c.code+" "+c.name;
 const CORE=[[480,555],[570,645],[750,825]];
 const coreHit=x=>!x.online&&(x.days.includes("T")||x.days.includes("R"))&&CORE.some(([s,e])=>x.s<e&&s<x.e);
 const coreTag=x=>coreHit(x)?`<span class="tag warn">Conflicts with 1st year core classes</span>`:"";
-const mbaSame=x=>x.online?[]:C.filter(c=>overlap(c,x));
+const mbaSame=x=>x.online?[]:C.filter(c=>!isDone(c)&&overlap(c,x));
+const doneCtl=()=>`<label class="chk"><input type="checkbox" id="showdone" ${showDone?"checked":""}> Show completed classes (${done.size})</label><button class="clear" style="margin-left:0" data-cleardone="1">Clear completed</button>`;
 const blkTxt=b=>b==="1st"?"1st block · Jan 6–Feb 24":b==="2nd"?"2nd block · Feb 25–Apr 14":"";
 const fmtCr=n=>Number.isInteger(n)?String(n):n.toFixed(1);
 
@@ -422,25 +436,26 @@ function sorted(list){
 function filtered(){
   const t=q.toLowerCase();
   return C.filter(c=>(!t||(c.code+c.name+c.prof+c.room).toLowerCase().includes(t))
-    &&(!dayF||c.days.includes(dayF))&&(!hideFull||c.seats>=10));
+    &&(!dayF||c.days.includes(dayF))&&(!hideFull||c.seats>=10)&&vis(c));
 }
 
 function rowHTML(c,cl){
   const on=sel.has(c.id);
-  const ov=c.over.length;
-  return `<tr class="${on?"sel":""} ${cl.has(c.id)?"clash":""}" id="r${c.id}">
+  const ov=overOf(c).length,dn=isDone(c),dk=esc(doneKey(c));
+  return `<tr class="${on?"sel":""} ${cl.has(c.id)?"clash":""} ${dn?"done":""}" id="r${c.id}">
     <td><span class="code">${esc(c.code)}</span></td>
     <td>${esc(c.name)}<div class="sub">${esc(c.room)} · ${c.cr} cr · ${c.seats} seats</div>
       ${c.note?c.note.split(/ (?=℀)/).map(n=>`<span class="tag">${esc(n)}</span>`).join(""):""}${coreTag(c)}</td>
     <td>${esc(c.prof)}</td>
     <td class="time">${esc(timeStr(c))}</td>
-    <td>${ov?`<button class="ovl" data-ov="${c.id}" aria-expanded="${open.has(c.id)}">${ov} overlap${ov>1?"s":""} ${open.has(c.id)?"▴":"▾"}</button>`:`<span class="none">none</span>`}</td>
-    <td><button class="add" data-add="${c.id}" aria-pressed="${on}">${on?"Added":"Add"}</button></td></tr>`+(open.has(c.id)?detailHTML(c):"");
+    <td>${dn?`<span class="none">–</span>`:ov?`<button class="ovl" data-ov="${c.id}" aria-expanded="${open.has(c.id)}">${ov} overlap${ov>1?"s":""} ${open.has(c.id)?"▴":"▾"}</button>`:`<span class="none">none</span>`}</td>
+    <td>${dn?`<span class="tag ok">Completed</span>`:`<button class="add" data-add="${c.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}<div><button class="lnk" data-done="${dk}">${dn?"Undo completed":"Mark completed"}</button></div></td></tr>`+(open.has(c.id)&&!dn?detailHTML(c):"");
 }
 
 function detailHTML(c){
+  const ovl=overOf(c);
   const mini=(o,extra)=>`<li><span class="code" style="min-width:84px">${esc(o.code)}</span><span class="nm">${esc(o.name)}<div class="sub">${esc(o.prof)} · ${esc(timeStr(o))} · ${o.seats} seats</div>${coreTag(o)}${extra||""}</span><button class="add" data-add="${o.id}" aria-pressed="${sel.has(o.id)}">${sel.has(o.id)?"Added":"Add"}</button></li>`;
-  const overSet=new Set(c.over.map(o=>o.id));
+  const overSet=new Set(ovl.map(o=>o.id));
   const alt=a=>{
     const sameBlock=overlap(a,c);
     const shared=a.over.filter(o=>overSet.has(o.id)).length;
@@ -453,7 +468,7 @@ function detailHTML(c){
     return mini(a,tag);
   };
   return `<tr class="detail"><td colspan="6"><div class="dbox">
-    <div class="dcol"><h4>Overlaps with ${c.over.length} section${c.over.length>1?"s":""}</h4><ul class="mini">${c.over.map(o=>mini(o)).join("")}</ul></div>
+    <div class="dcol"><h4>Overlaps with ${ovl.length} section${ovl.length>1?"s":""}</h4><ul class="mini">${ovl.map(o=>mini(o)).join("")}</ul></div>
     <div class="dcol"><h4>Other sections of ${esc(c.name)}</h4>${c.alts.length?`<ul class="mini">${c.alts.map(alt).join("")}</ul>`:`<div class="sub">Only one section of this class is offered, so there is no way around this block.</div>`}</div>
     <div class="dfoot"><button class="ovl" data-focus="${c.id}">See more</button><button class="ovl" data-ov="${c.id}">Close</button></div>
   </div></td></tr>`;
@@ -465,8 +480,9 @@ function allView(){
   let focusNote="";
   if(focusId!==null){
     const f=C[focusId];
-    list=sorted([f,...f.over]);
-    focusNote=`<div class="note">Showing <b>${esc(f.code)} ${esc(f.name)}</b> (${esc(timeStr(f))}) and the ${f.over.length} section${f.over.length>1?"s":""} that overlap it. <button class="ovl" data-clearfocus="1">Show all classes</button></div>`;
+    const fo=overOf(f);
+    list=sorted([f,...fo]);
+    focusNote=`<div class="note">Showing <b>${esc(f.code)} ${esc(f.name)}</b> (${esc(timeStr(f))}) and the ${fo.length} section${fo.length>1?"s":""} that overlap it. <button class="ovl" data-clearfocus="1">Show all classes</button></div>`;
   }
   const th=(k,l)=>`<th data-sort="${k}">${l}${sortK===k?(sortDir>0?" ▲":" ▼"):""}</th>`;
   return `${focusNote}
@@ -477,7 +493,8 @@ function allView(){
       ${[...DORDER].map(d=>`<option value="${d}" ${dayF===d?"selected":""}>${DN[d]}</option>`).join("")}
     </select>
     <label class="chk"><input type="checkbox" id="full" ${hideFull?"checked":""}> Hide sections under 10 seats</label>
-    <span class="sub">${list.length} of ${C.length} shown</span>
+    ${done.size?doneCtl():""}
+    <span class="sub">${list.length} of ${C.filter(vis).length} shown</span>
   </div>
   <div class="tablewrap"><table>
     <thead><tr>${th("code","Code")}${th("name","Class")}${th("prof","Professor")}${th("time","Time")}<th style="cursor:default">Same time as</th><th style="cursor:default"></th></tr></thead>
@@ -490,7 +507,7 @@ function allView(){
 
 function slotsView(){
   const groups={};
-  C.forEach(c=>{const k=c.days+"|"+c.s+"|"+c.e;(groups[k]=groups[k]||[]).push(c)});
+  C.filter(vis).forEach(c=>{const k=c.days+"|"+c.s+"|"+c.e;(groups[k]=groups[k]||[]).push(c)});
   const keys=Object.keys(groups).sort((a,b)=>{
     const [da,sa]=a.split("|"),[db,sb]=b.split("|");
     const o=x=>Math.min(...[...x].map(d=>DORDER.indexOf(d)));
@@ -578,6 +595,7 @@ function gapsFor(d){
 function swBase(){
   const t=swQ.toLowerCase();
   return S.filter(x=>{
+    if(!vis(x))return false;
     if(t&&!(x.code+" "+x.name+" "+x.prof+" "+x.room).toLowerCase().includes(t))return false;
     if(x.online){
       if(swAfter!==""||swBefore!=="")return false;
@@ -609,7 +627,7 @@ function swRow(x){
   return `<li class="${on?"sel":""}"><span class="code" style="min-width:48px">${esc(x.sec)}</span>
     <span class="nm">${esc(timeStr(x))}<div class="sub">${esc(x.online?"Online":swWhere(x))} · ${esc(x.prof||"Instructor TBA")} · ${seats}</div>${mbaNote}
     ${coreTag(x)}${x.blk?`<span class="tag">${esc(blkTxt(x.blk))}</span>`:""}${cf.length?`<span class="tag warn">Conflicts with ${esc(cf.map(o=>o.code).join(", "))}</span>`:""}</span>
-    <button class="add sw" data-add="${x.id}" aria-pressed="${on}">${on?"Added":"Add"}</button></li>`;
+    ${isDone(x)?`<span class="tag ok">Completed</span>`:`<button class="add sw" data-add="${x.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}</li>`;
 }
 
 function fillView(){
@@ -645,7 +663,7 @@ function fillView(){
   <div class="controls">
     <label class="chk"><input type="checkbox" id="swonline" ${swOnline?"checked":""}> Include online sections</label>
     <label class="chk"><input type="checkbox" id="swconf" ${swShowConf?"checked":""}> Also show sections that conflict${hidden&&!swShowConf?` (${hidden} hidden)`:""}</label>
-    ${filt?`<button class="clear" style="margin-left:0" data-swreset="1">Clear filters</button>`:""}
+    ${done.size?doneCtl():""}${filt?`<button class="clear" style="margin-left:0" data-swreset="1">Clear filters</button>`:""}
     <span class="sub" style="margin-left:auto">${shown.length} section${shown.length===1?"":"s"} in ${acts.length} activit${acts.length===1?"y":"ies"}${sw.length?` · ${sw.length} added (${fmtCr(sw.length*0.5)} cr)`:""}</span>
   </div>`;
   if(!acts.length){
@@ -654,7 +672,7 @@ function fillView(){
     html+=acts.map(k=>{
       const g=byAct[k].sort((a,b)=>dayRank(a)-dayRank(b)||(a.online?0:a.s)-(b.online?0:b.s)||a.sec.localeCompare(b.sec));
       const o=isOpenAct(k),nAdd=g.filter(x=>sel.has(x.id)).length;
-      return `<div class="group sw"><h3><button class="acthd" data-act="${k}" aria-expanded="${o}">${o?"▾":"▸"} ${esc(TITLES[k])}<span class="sub">SWELL ${k}</span></button><span>${nAdd?`${nAdd} added · `:""}${g.length} section${g.length>1?"s":""}</span></h3>${o?`<ul>${g.map(swRow).join("")}</ul>`:""}</div>`}).join("");
+      return `<div class="group sw ${isDone(g[0])?"dn":""}"><h3><button class="acthd" data-act="${k}" aria-expanded="${o}">${o?"▾":"▸"} ${esc(TITLES[k])}<span class="sub">SWELL ${k}</span></button><span>${nAdd?`${nAdd} added · `:""}${g.length} section${g.length>1?"s":""} · <button class="lnk" data-done="s:${k}">${isDone(g[0])?"Undo completed":"Mark completed"}</button></span></h3>${o?`<ul>${g.map(swRow).join("")}</ul>`:""}</div>`}).join("");
   }
   html+=`<div class="note"><b>Notes.</b> Every SWELL section is 0.5 credit. Semester runs Jan 6 – Apr 14, 2027; 1st block is Jan 6–Feb 24 and 2nd block is Feb 25–Apr 14, so a 1st-block and a 2nd-block section can share a time slot. MBA classes are treated as running the full semester. Buildings: RB Richards · SFH Smith Fieldhouse · WSC Wilkinson Student Center · IPF Indoor Practice Facility · RBF/NUF fields · TCF/TCB tennis · SFLD/GLFG golf. Scuba meets for a 6:00pm classroom hour, then a pool or dive session 8:00–9:50pm; it is shown here as one block. Seat counts are from Oct 9, 2026, so check MyMAP before you register.</div>`;
   return html;
@@ -671,7 +689,7 @@ function render(keepFocus){
 
 const keepY=fn=>{const y=window.scrollY;fn();render();window.scrollTo(0,y)};
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-add],[data-sort],[data-ov],[data-focus],[data-clearfocus],[data-clearall],[data-clearsw],[data-gap],[data-act],[data-swreset]");
+  const t=e.target.closest("[data-tab],[data-add],[data-sort],[data-ov],[data-focus],[data-clearfocus],[data-clearall],[data-clearsw],[data-gap],[data-act],[data-swreset],[data-done],[data-cleardone]");
   if(!t)return;
   if(t.dataset.tab){tab=t.dataset.tab;render();window.scrollTo(0,0)}
   else if(t.dataset.add!==undefined){const i=+t.dataset.add;keepY(()=>{sel.has(i)?sel.delete(i):sel.add(i);save()})}
@@ -684,6 +702,8 @@ document.addEventListener("click",e=>{
   else if(t.dataset.gap){const [d,s,en]=t.dataset.gap.split("|");
     if(swDay===d&&swAfter===+s&&swBefore===+en){swDay="";swAfter="";swBefore=""}else{swDay=d;swAfter=+s;swBefore=+en}render()}
   else if(t.dataset.act){const k=t.dataset.act;keepY(()=>{actState[k]=!isOpenAct(k)})}
+  else if(t.dataset.done){const k=t.dataset.done;keepY(()=>{if(done.has(k))done.delete(k);else{done.add(k);[...sel].forEach(i=>{if(doneKey(A(i))===k)sel.delete(i)})}saveDone();save()})}
+  else if(t.dataset.cleardone){done.clear();saveDone();render()}
   else if(t.dataset.swreset){swQ="";swDay="";swAfter="";swBefore="";swBlock="";swOnline=true;swShowConf=false;render()}
 });
 document.addEventListener("input",e=>{
@@ -700,6 +720,7 @@ document.addEventListener("change",e=>{
   if(id==="swblock"){swBlock=v;render()}
   if(id==="swonline"){swOnline=e.target.checked;render()}
   if(id==="swconf"){swShowConf=e.target.checked;render()}
+  if(id==="showdone"){showDone=e.target.checked;render()}
 });
 render();
 </script>
