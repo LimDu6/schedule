@@ -33,11 +33,19 @@ header b{color:#fff}
 header .tag.warn{background:#fff;color:var(--warn);border-color:#fff}
 :root[data-theme="dark"] header .tag.warn,:root:not([data-theme="light"]) header .tag.warn{color:#b3261e}
 .wrap{max-width:1200px;margin:0 auto;padding:12px 20px 40px}
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px;flex-wrap:wrap}
-.tab{background:none;border:0;padding:10px 14px;font:inherit;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px}
-.tab[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
-.tab:hover{color:var(--accent)}
-.tab[data-tab="fill"][aria-selected="true"]{border-bottom-color:var(--ok)}
+.tabs{display:flex;gap:8px;margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tab{background:var(--panel);border:1.5px solid var(--line);border-radius:10px;padding:10px 16px;font:inherit;font-size:15px;font-weight:600;color:var(--accent);cursor:pointer;box-shadow:0 1px 2px rgba(0,30,70,.10);transition:background .12s,border-color .12s}
+.tab:hover{border-color:var(--accent);background:var(--accent-soft)}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--panel);box-shadow:0 2px 6px rgba(0,30,70,.28)}
+.tab[aria-selected="true"] .badge{background:rgba(255,255,255,.24);color:inherit}
+.tab[data-tab="fill"][aria-selected="true"]{background:var(--ok);border-color:var(--ok)}
+.tab[data-tab="favs"][aria-selected="true"]{background:var(--star);border-color:var(--star);color:#1b1400}
+th.sortable{cursor:pointer;user-select:none;white-space:nowrap}
+th.sortable:hover{background:var(--line)}
+th.sortable .sortic{margin-left:6px;font-size:12px;opacity:.6}
+th.sortable.on{box-shadow:inset 0 -3px 0 var(--accent)}
+th.sortable.on .sortic{opacity:1}
+.sorthint{font-size:13px;color:var(--accent);font-weight:600;margin:2px 0 8px}
 .tab:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .badge{display:inline-block;min-width:20px;padding:0 6px;margin-left:6px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-size:12px;text-align:center}
 .badge.sw{background:var(--ok-soft);color:var(--ok)}
@@ -121,7 +129,6 @@ tr.done td{opacity:.55}
 .nmwarn{margin-top:4px;font-style:italic}
 .nmwarn a{color:var(--accent);font-weight:600}
 .lnks{display:flex;gap:0 12px;flex-wrap:wrap}
-.tab[data-tab="favs"][aria-selected="true"]{border-bottom-color:var(--star)}
 .badge.fv{background:var(--hl);color:var(--star)}
 .badge.sk{background:var(--line);color:var(--muted)}
 .acthead{display:flex;align-items:center;gap:2px}
@@ -133,17 +140,18 @@ tr.done td{opacity:.55}
   <h1>Winter 2027 schedule planner</h1>
   <p>Pick your MBA classes first. Then open <b>SWELL classes</b> to see only the SWELL activities that fit around them.</p>
   <p style="margin-top:6px">Sections tagged <span class="tag warn" style="margin:0">Conflicts with 1st year core classes</span> overlap the 1st year core schedule (Tue/Thu 8:00–9:15, 9:30–10:45 and 12:30–1:45).</p>
-  <p style="margin-top:6px">Already taken a class? Click <b>Mark completed</b> on it. It then disappears from the lists and from the overlap warnings.</p>
+  <p style="margin-top:6px">Already taken a class? Click <b>Class already taken</b> on it. It then disappears from the lists and from the overlap warnings.</p>
   <p style="margin-top:6px">Tap <b>☆</b> to save a class to your <b>Favorites</b> tab. Click <b>Not interested in this class</b> on a class you don't want to see: it's hidden everywhere and parked on the <b>Not for me</b> tab, where you can bring it back any time.</p>
 </header>
 <div class="wrap">
   <div class="tabs" role="tablist">
     <button class="tab" role="tab" data-tab="all" aria-selected="true">MBA classes</button>
-    <button class="tab" role="tab" data-tab="slots" aria-selected="false">Same-time groups</button>
+    <button class="tab" role="tab" data-tab="slots" aria-selected="false">Classes by time</button>
     <button class="tab" role="tab" data-tab="favs" aria-selected="false">Favorites<span class="badge fv" id="cntfav">0</span></button>
     <button class="tab" role="tab" data-tab="mine" aria-selected="false">My schedule<span class="badge" id="cnt">0</span></button>
     <button class="tab" role="tab" data-tab="fill" aria-selected="false">SWELL classes<span class="badge sw" id="cntsw">0</span></button>
-    <button class="tab" role="tab" data-tab="nonmba" aria-selected="false">Non MBA classes that count towards graduation</button>
+    <button class="tab" role="tab" data-tab="nonmba" aria-selected="false">Non-MBA classes</button>
+    <button class="tab" role="tab" data-tab="every" aria-selected="false">All classes</button>
     <button class="tab" role="tab" data-tab="skip" aria-selected="false">Not for me<span class="badge sk" id="cntskip">0</span></button>
   </div>
   <div id="view"></div>
@@ -451,9 +459,12 @@ const CORE=[[480,555],[570,645],[750,825]];
 const coreHit=x=>!x.online&&(x.days.includes("T")||x.days.includes("R"))&&CORE.some(([s,e])=>x.s<e&&s<x.e);
 const coreTag=x=>coreHit(x)?`<span class="tag warn">Conflicts with 1st year core classes</span>`:"";
 const mbaSame=x=>x.online?[]:C.filter(c=>!isDone(c)&&!isSkip(c)&&overlap(c,x));
-const doneCtl=()=>`<label class="chk"><input type="checkbox" id="showdone" ${showDone?"checked":""}> Show completed classes (${done.size})</label><button class="clear" style="margin-left:0" data-cleardone="1">Clear completed</button>`;
+const doneCtl=()=>`<label class="chk"><input type="checkbox" id="showdone" ${showDone?"checked":""}> Show classes already taken (${done.size})</label><button class="clear" style="margin-left:0" data-cleardone="1">Clear already taken</button>`;
 const blkTxt=b=>b==="1st"?"1st block · Jan 6–Feb 24":b==="2nd"?"2nd block · Feb 25–Apr 14":"";
 const fmtCr=n=>Number.isInteger(n)?String(n):n.toFixed(1);
+
+const sortTh=(k,l,on,dir,attr)=>`<th ${attr}="${k}" class="sortable ${on?"on":""}" title="Click to sort by ${esc(l)}">${esc(l)}<span class="sortic">${on?(dir>0?"▲":"▼"):"⇅"}</span></th>`;
+const SORTHINT=`<div class="sorthint">⇅ Click any column heading to sort the table</div>`;
 
 function sorted(list){
   const k={time:c=>[dayRank(c),c.online?0:c.s],
@@ -481,7 +492,7 @@ function rowHTML(c,cl){
     <td>${esc(c.prof)}</td>
     <td class="time">${esc(timeStr(c))}</td>
     <td>${dn?`<span class="none">–</span>`:ov?`<button class="ovl" data-ov="${c.id}" aria-expanded="${open.has(c.id)}">${ov} overlap${ov>1?"s":""} ${open.has(c.id)?"▴":"▾"}</button>`:`<span class="none">none</span>`}</td>
-    <td>${dn?`<span class="tag ok">Completed</span>`:`<button class="add" data-add="${c.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}<div class="lnks"><button class="lnk" data-done="${dk}">${dn?"Undo completed":"Mark completed"}</button><button class="lnk" data-skip="${dk}">Not interested in this class</button></div></td></tr>`+(open.has(c.id)&&!dn?detailHTML(c):"");
+    <td>${dn?`<span class="tag ok">Already taken</span>`:`<button class="add" data-add="${c.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}<div class="lnks"><button class="lnk" data-done="${dk}">${dn?"Undo class already taken":"Class already taken"}</button><button class="lnk" data-skip="${dk}">Not interested in this class</button></div></td></tr>`+(open.has(c.id)&&!dn?detailHTML(c):"");
 }
 
 function detailHTML(c){
@@ -516,7 +527,7 @@ function allView(){
     list=sorted([f,...fo]);
     focusNote=`<div class="note">Showing <b>${esc(f.code)} ${esc(f.name)}</b> (${esc(timeStr(f))}) and the ${fo.length} section${fo.length>1?"s":""} that overlap it. <button class="ovl" data-clearfocus="1">Show all classes</button></div>`;
   }
-  const th=(k,l)=>`<th data-sort="${k}">${l}${sortK===k?(sortDir>0?" ▲":" ▼"):""}</th>`;
+  const th=(k,l)=>sortTh(k,l,sortK===k,sortDir,"data-sort");
   return `${focusNote}
   <div class="controls">
     <input type="search" id="q" placeholder="Search code, name, professor, room" value="${esc(q)}" aria-label="Search classes">
@@ -528,6 +539,7 @@ function allView(){
     ${done.size?doneCtl():""}
     <span class="sub">${list.length} of ${C.filter(vis).length} shown</span>
   </div>
+  ${SORTHINT}
   <div class="tablewrap"><table>
     <thead><tr>${th("code","Code")}${th("name","Class")}${th("prof","Professor")}${th("time","Time")}<th style="cursor:default">Same time as</th><th style="cursor:default"></th></tr></thead>
     <tbody>${list.length?list.map(c=>rowHTML(c,cl)).join(""):`<tr><td colspan="6" class="empty">No classes match those filters.</td></tr>`}</tbody>
@@ -544,14 +556,14 @@ function slotsView(){
     const [da,sa]=a.split("|"),[db,sb]=b.split("|");
     const o=x=>Math.min(...[...x].map(d=>DORDER.indexOf(d)));
     return (o(da)-o(db))||(+sa-+sb)||a.localeCompare(b)});
-  let html=`<div class="note">Each box is one exact meeting time. Classes in the same box directly conflict. Classes that only partly overlap (for example a 2:00–2:50 class and a 2:00–3:15 class) are marked in the "Same time as" column on the MBA classes tab.</div>`;
+  let html=`<div class="note">Each box is one exact meeting time. Classes in the same box directly conflict. Classes that only partly overlap (for example a 2:00–2:50 class and a 2:00–3:15 class) are marked in the "Same time as" column on the MBA classes tab.</div>`+(done.size?`<div class="controls">${doneCtl()}</div>`:"");
   let lastDay="";
   keys.forEach(k=>{
     const g=groups[k],c0=g[0];
     if(c0.days!==lastDay){lastDay=c0.days;html+=`<h2 class="daytitle">${pat(c0)}</h2>`}
     html+=`<div class="group"><h3>${fmt(c0.s)}–${fmt(c0.e)}<span>${g.length} section${g.length>1?"s":""}</span></h3><ul>`+
       g.map(c=>`<li>${starBtn(doneKey(c))}<span class="code" style="min-width:92px">${esc(c.code)}</span><span class="nm">${esc(c.name)}<div class="sub">${esc(c.prof)} · ${esc(c.room)}</div>${coreTag(c)}</span>
-      <button class="add" data-add="${c.id}" aria-pressed="${sel.has(c.id)}">${sel.has(c.id)?"Added":"Add"}</button><button class="lnk" data-skip="${esc(doneKey(c))}">Not interested in this class</button></li>`).join("")+`</ul></div>`;
+      ${isDone(c)?`<span class="tag ok">Already taken</span>`:`<button class="add" data-add="${c.id}" aria-pressed="${sel.has(c.id)}">${sel.has(c.id)?"Added":"Add"}</button>`}<button class="lnk" data-done="${esc(doneKey(c))}">${isDone(c)?"Undo class already taken":"Class already taken"}</button><button class="lnk" data-skip="${esc(doneKey(c))}">Not interested in this class</button></li>`).join("")+`</ul></div>`;
   });
   return html;
 }
@@ -659,7 +671,7 @@ function swRow(x){
   return `<li class="${on?"sel":""}"><span class="code" style="min-width:48px">${esc(x.sec)}</span>
     <span class="nm">${esc(timeStr(x))}<div class="sub">${esc(x.online?"Online":swWhere(x))} · ${esc(x.prof||"Instructor TBA")} · ${seats}</div>${mbaNote}
     ${coreTag(x)}${x.blk?`<span class="tag">${esc(blkTxt(x.blk))}</span>`:""}${cf.length?`<span class="tag warn">Conflicts with ${esc(cf.map(o=>o.code).join(", "))}</span>`:""}</span>
-    ${isDone(x)?`<span class="tag ok">Completed</span>`:`<button class="add sw" data-add="${x.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}</li>`;
+    ${isDone(x)?`<span class="tag ok">Already taken</span>`:`<button class="add sw" data-add="${x.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}</li>`;
 }
 
 function fillView(){
@@ -860,18 +872,20 @@ const NM=NM_RAW.split("\n").map(l=>{
   const [dept,code,name,prof,loc,days,time]=l.split("|");
   return {kind:"nonmba",dept,code,name,prof,loc,days,time,lvl:numOf(code)>=500?"500":"400"};
 }).sort((a,b)=>DORD.indexOf(a.dept)-DORD.indexOf(b.dept)||numOf(a.code)-numOf(b.code)||a.code.localeCompare(b.code));
+const NMWARN=`<div class="sub nmwarn">This class has many sections. Please visit <a href="https://commtech.byu.edu/auth/mymap/" target="_blank" rel="noopener">BYU MyMap</a> for the correct information.</div>`;
+const nmProb=x=>x.time.includes("(multiple)")||x.days.includes("/");
 const nmTbd=v=>v==="TBD"?`<span class="sub">TBD</span>`:null;
 const nmLines=(v,sep)=>v.split(sep).map(t=>`<div style="white-space:nowrap">${nmTbd(t.trim())||esc(t.trim())}</div>`).join("");
 const nmRow=x=>{
   const k=doneKey(x),dn=isDone(x),ek=esc(k);
   const prob=x.time.includes("(multiple)")||x.days.includes("/");
   return `<tr class="${dn?"done":""}"><td>${starBtn(k)}<span class="code">${esc(x.code)}</span></td>
-    <td>${esc(x.name)}<div class="sub">${esc(DEPT[x.dept])}</div>${prob?`<div class="sub nmwarn">This class has many sections. Please visit <a href="https://commtech.byu.edu/auth/mymap/" target="_blank" rel="noopener">BYU MyMap</a> for the correct information.</div>`:""}</td>
+    <td>${esc(x.name)}<div class="sub">${esc(DEPT[x.dept])}</div>${prob?NMWARN:""}</td>
     <td>${nmTbd(x.prof)||esc(x.prof.replace(/ \/ /g,", "))}</td>
     <td>${nmTbd(x.days)||esc(x.days.replace(/\//g," / "))}</td>
     <td>${nmLines(x.time.replace(" (multiple)","")," / ")}</td>
     <td>${nmTbd(x.loc)||esc(x.loc)}</td>
-    <td><div class="lnks"><button class="lnk" data-done="${ek}">${dn?"Undo completed":"Mark completed"}</button><button class="lnk" data-skip="${ek}">Not interested in this class</button></div></td></tr>`;
+    <td><div class="lnks"><button class="lnk" data-done="${ek}">${dn?"Undo class already taken":"Class already taken"}</button><button class="lnk" data-skip="${ek}">Not interested in this class</button></div></td></tr>`;
 };
 const nmTable=list=>`<div class="tablewrap"><table>
   <thead><tr><th style="cursor:default">Code</th><th style="cursor:default">Class</th><th style="cursor:default">Professor</th><th style="cursor:default">Days</th><th style="cursor:default">Time</th><th style="cursor:default">Location</th><th style="cursor:default"></th></tr></thead>
@@ -893,10 +907,69 @@ function nonView(){
   </div>`+(depts.length?depts.map(d=>`<h2 class="daytitle">${d} – ${esc(DEPT[d])}</h2>`+nmTable(list.filter(x=>x.dept===d))).join(""):`<div class="note empty">No classes match those filters.</div>`);
 }
 
+// ---- All classes tab: MBA + SWELL + Non-MBA in one searchable, sortable table
+let eQ="",eTy="",eK="type",eDir=1;
+const kindOf=x=>x.kind==="swell"?"SWELL":x.kind==="nonmba"?"Non-MBA":"MBA";
+const eCode=x=>x.kind==="swell"?"SWELL "+x.num:x.code;
+const eText=x=>[eCode(x),x.name,x.prof||"",x.room||x.loc||"",x.dept?DEPT[x.dept]:"",kindOf(x)].join(" ").toLowerCase();
+const eSort=list=>{
+  const key={
+    code:x=>eCode(x),name:x=>x.name,prof:x=>x.prof==="TBD"?"":(x.prof||""),type:x=>kindOf(x),
+    time:x=>x.kind==="nonmba"?1e9:dayRank(x)*10000+(x.online?0:x.s)
+  }[eK];
+  return [...list].sort((a,b)=>{
+    const u=key(a),v=key(b);
+    const c=typeof u==="number"?u-v:String(u).localeCompare(String(v),undefined,{numeric:true});
+    return (c||eCode(a).localeCompare(eCode(b),undefined,{numeric:true})||(a.s||0)-(b.s||0))*eDir;
+  });
+};
+function eRow(x,cl){
+  const kind=kindOf(x),k=doneKey(x),ek=esc(k),dn=isDone(x),addable=kind!=="Non-MBA";
+  const on=addable&&sel.has(x.id);
+  let sub,when,extra="";
+  if(kind==="MBA"){
+    sub=`${esc(x.room)} · ${x.cr} cr · ${x.seats} seats`;when=esc(timeStr(x));extra=coreTag(x);
+  }else if(kind==="SWELL"){
+    sub=`Section ${esc(x.sec)} · ${esc(x.online?"Online":swWhere(x))} · ${x.open<=0?"Full":x.open+"/"+x.seats+" seats"}`;
+    when=esc(timeStr(x));extra=coreTag(x)+(x.blk?`<span class="tag">${esc(blkTxt(x.blk))}</span>`:"");
+  }else{
+    sub=`${esc(DEPT[x.dept])} · ${esc(x.loc)}`;
+    when=(x.days==="TBD"?"":`<div>${esc(x.days.replace(/\//g," / "))}</div>`)+nmLines(x.time.replace(" (multiple)","")," / ");
+    extra=nmProb(x)?NMWARN:"";
+  }
+  const prof=x.kind==="nonmba"?(x.prof==="TBD"?"TBD":x.prof.replace(/ \/ /g,", ")):(x.prof||"Instructor TBA");
+  return `<tr class="${on?"sel":""} ${addable&&cl.has(x.id)?"clash":""} ${dn?"done":""}">
+    <td>${starBtn(k)}<span class="code">${esc(eCode(x))}</span></td>
+    <td>${esc(x.name)}<div class="sub">${sub}</div>${extra}</td>
+    <td>${esc(prof)}</td>
+    <td>${when}</td>
+    <td><span class="tag ${kind==="SWELL"?"ok":""}" style="white-space:nowrap">${kind}</span></td>
+    <td>${dn?`<span class="tag ok">Already taken</span>`:addable?`<button class="add${kind==="SWELL"?" sw":""}" data-add="${x.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`:""}<div class="lnks"><button class="lnk" data-done="${ek}">${dn?"Undo class already taken":"Class already taken"}</button><button class="lnk" data-skip="${ek}">Not interested in this class</button></div></td></tr>`;
+}
+function everyView(){
+  const cl=clashIds();
+  const ql=eQ.trim().toLowerCase();
+  const pool=[...C,...S,...NM].filter(vis);
+  const list=eSort(pool.filter(x=>(!eTy||kindOf(x)===eTy)&&(!ql||eText(x).includes(ql))));
+  const th=(k,l)=>sortTh(k,l,eK===k,eDir,"data-esort");
+  return `<div class="note">Search every class in one place: MBA, SWELL and non-MBA classes. MBA and SWELL classes can be added to your schedule from here. Non-MBA classes can't be added, so check BYU MyMap for their schedules.</div>
+  <div class="controls">
+    <input type="search" id="eq" placeholder="Search any class, professor or room" value="${esc(eQ)}" aria-label="Search all classes">
+    <select id="etype" aria-label="Filter by type"><option value="">All types</option><option value="MBA" ${eTy==="MBA"?"selected":""}>MBA classes</option><option value="SWELL" ${eTy==="SWELL"?"selected":""}>SWELL classes</option><option value="Non-MBA" ${eTy==="Non-MBA"?"selected":""}>Non-MBA classes</option></select>
+    ${done.size?doneCtl():""}
+    <span class="sub">${list.length} of ${pool.length} shown</span>
+  </div>
+  ${SORTHINT}
+  <div class="tablewrap"><table>
+    <thead><tr>${th("code","Code")}${th("name","Class")}${th("prof","Professor")}${th("time","Days & time")}${th("type","Type")}<th style="cursor:default"></th></tr></thead>
+    <tbody>${list.length?list.map(x=>eRow(x,cl)).join(""):`<tr><td colspan="6" class="empty">No classes match that search.</td></tr>`}</tbody>
+  </table></div>`;
+}
+
 function swGroup(k,list){
   const g=[...list].sort((a,b)=>dayRank(a)-dayRank(b)||(a.online?0:a.s)-(b.online?0:b.s)||a.sec.localeCompare(b.sec));
   const o=isOpenAct(k),nAdd=g.filter(x=>sel.has(x.id)).length,key="s:"+k;
-  return `<div class="group sw ${isDone(g[0])?"dn":""}"><h3><span class="acthead">${starBtn(key)}<button class="acthd" data-act="${k}" aria-expanded="${o}">${o?"▾":"▸"} ${esc(TITLES[k])}<span class="sub">SWELL ${k}</span></button></span><span>${nAdd?`${nAdd} added · `:""}${g.length} section${g.length>1?"s":""} · <button class="lnk" data-done="${key}">${isDone(g[0])?"Undo completed":"Mark completed"}</button> · <button class="lnk" data-skip="${key}">Not interested in this class</button></span></h3>${o?`<ul>${g.map(swRow).join("")}</ul>`:""}</div>`;
+  return `<div class="group sw ${isDone(g[0])?"dn":""}"><h3><span class="acthead">${starBtn(key)}<button class="acthd" data-act="${k}" aria-expanded="${o}">${o?"▾":"▸"} ${esc(TITLES[k])}<span class="sub">SWELL ${k}</span></button></span><span>${nAdd?`${nAdd} added · `:""}${g.length} section${g.length>1?"s":""} · <button class="lnk" data-done="${key}">${isDone(g[0])?"Undo class already taken":"Class already taken"}</button> · <button class="lnk" data-skip="${key}">Not interested in this class</button></span></h3>${o?`<ul>${g.map(swRow).join("")}</ul>`:""}</div>`;
 }
 
 function favsView(){
@@ -909,10 +982,10 @@ function favsView(){
   if(!m.length&&!acts.length&&!nm.length){
     return `<div class="note empty">No favorites yet. Tap the <b>☆</b> next to any MBA or SWELL class and it will be saved here, so you can compare your shortlist and add the sections you want.</div>`+(done.size?`<div class="controls">${doneCtl()}</div>`:"");
   }
-  const th=(k,l)=>`<th data-sort="${k}">${l}${sortK===k?(sortDir>0?" ▲":" ▼"):""}</th>`;
+  const th=(k,l)=>sortTh(k,l,sortK===k,sortDir,"data-sort");
   let html=`<div class="note">Your shortlist. Favoriting a class saves every section of it. Use <b>Add</b> to put a section on your schedule.</div>`;
   if(done.size)html+=`<div class="controls">${doneCtl()}</div>`;
-  if(m.length)html+=`<h2 class="daytitle">MBA classes</h2><div class="tablewrap"><table>
+  if(m.length)html+=`<h2 class="daytitle">MBA classes</h2>${SORTHINT}<div class="tablewrap"><table>
     <thead><tr>${th("code","Code")}${th("name","Class")}${th("prof","Professor")}${th("time","Time")}<th style="cursor:default">Same time as</th><th style="cursor:default"></th></tr></thead>
     <tbody>${m.map(c=>rowHTML(c,cl)).join("")}</tbody></table></div>`;
   if(acts.length){
@@ -943,16 +1016,17 @@ function render(keepFocus){
   document.getElementById("cntskip").textContent=skips.size;
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.tab===tab));
   const v=document.getElementById("view");
-  v.innerHTML=tab==="all"?allView():tab==="slots"?slotsView():tab==="fill"?fillView():tab==="favs"?favsView():tab==="skip"?skipView():tab==="nonmba"?nonView():mineView();
-  if(keepFocus){const el=document.getElementById(tab==="fill"?"swq":tab==="nonmba"?"nq":"q");const len=tab==="fill"?swQ.length:tab==="nonmba"?nQ.length:q.length;if(el){el.focus();el.setSelectionRange(len,len)}}
+  v.innerHTML=tab==="all"?allView():tab==="slots"?slotsView():tab==="fill"?fillView():tab==="favs"?favsView():tab==="skip"?skipView():tab==="nonmba"?nonView():tab==="every"?everyView():mineView();
+  if(keepFocus){const el=document.getElementById(tab==="fill"?"swq":tab==="nonmba"?"nq":tab==="every"?"eq":"q");const len=tab==="fill"?swQ.length:tab==="nonmba"?nQ.length:tab==="every"?eQ.length:q.length;if(el){el.focus();el.setSelectionRange(len,len)}}
 }
 
 const keepY=fn=>{const y=window.scrollY;fn();render();window.scrollTo(0,y)};
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-add],[data-sort],[data-ov],[data-focus],[data-clearfocus],[data-clearall],[data-clearsw],[data-gap],[data-act],[data-swreset],[data-done],[data-cleardone],[data-fav],[data-skip],[data-clearskip]");
+  const t=e.target.closest("[data-tab],[data-add],[data-sort],[data-esort],[data-ov],[data-focus],[data-clearfocus],[data-clearall],[data-clearsw],[data-gap],[data-act],[data-swreset],[data-done],[data-cleardone],[data-fav],[data-skip],[data-clearskip]");
   if(!t)return;
   if(t.dataset.tab){tab=t.dataset.tab;render();window.scrollTo(0,0)}
   else if(t.dataset.add!==undefined){const i=+t.dataset.add;keepY(()=>{sel.has(i)?sel.delete(i):sel.add(i);save()})}
+  else if(t.dataset.esort){const k=t.dataset.esort;if(eK===k)eDir*=-1;else{eK=k;eDir=1}render()}
   else if(t.dataset.sort){const k=t.dataset.sort;if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=1}render()}
   else if(t.dataset.ov){const i=+t.dataset.ov;keepY(()=>{open.has(i)?open.delete(i):open.add(i)})}
   else if(t.dataset.focus){focusId=+t.dataset.focus;open.clear();render();window.scrollTo(0,0)}
@@ -973,12 +1047,14 @@ document.addEventListener("input",e=>{
   if(e.target.id==="q"){q=e.target.value;focusId=null;render(true)}
   if(e.target.id==="swq"){swQ=e.target.value;render(true)}
   if(e.target.id==="nq"){nQ=e.target.value;render(true)}
+  if(e.target.id==="eq"){eQ=e.target.value;render(true)}
 });
 document.addEventListener("change",e=>{
   const id=e.target.id,v=e.target.value;
   if(id==="day"){dayF=v;focusId=null;render()}
   if(id==="full"){hideFull=e.target.checked;render()}
   if(id==="ndept"){nDept=v;render()}
+  if(id==="etype"){eTy=v;render()}
   if(id==="nlvl"){nLvl=v;render()}
   if(id==="swday"){swDay=v;render()}
   if(id==="swafter"){swAfter=v===""?"":+v;render()}
