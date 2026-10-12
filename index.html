@@ -133,29 +133,189 @@ tr.done td{opacity:.55}
 .badge.sk{background:var(--line);color:var(--muted)}
 .acthead{display:flex;align-items:center;gap:2px}
 .group.dn{opacity:.6}
+
+/* ---- navigation, sticky bar, controls ---- */
+[hidden]{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.skip{position:absolute;left:-999px;top:0;background:#fff;color:#000;padding:8px 12px;z-index:100;border-radius:0 0 8px 0}
+.skip:focus{left:0}
+header details{margin-top:8px;max-width:80ch}
+header summary{cursor:pointer;color:#fff;font-weight:600;text-decoration:underline;font-size:14px;width:max-content}
+.howto p{margin:8px 0 0}
+.sticky{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line);box-shadow:0 3px 8px rgba(0,30,70,.10)}
+.stickyin{max-width:1200px;margin:0 auto;padding:0 20px}
+.sumbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:8px 0 6px;font-size:14px;min-height:42px}
+.sumwarn{color:var(--warn);font-weight:700}
+.sumok{color:var(--ok);font-weight:600}
+.tabbar{display:flex;flex-wrap:wrap;gap:6px 22px;padding:0 0 10px;align-items:center}
+.tgroup{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.glabel{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700;margin-right:2px}
+.tab{padding:8px 14px}
+.btn{border:1.5px solid var(--accent);background:var(--panel);color:var(--accent);border-radius:8px;padding:7px 14px;font:inherit;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--accent-soft)}
+.btn.sm{padding:3px 10px;font-size:13px}
+.btn.primary{background:var(--accent);color:var(--panel)}
+.seg{display:inline-flex;border:1.5px solid var(--accent);border-radius:8px;overflow:hidden;margin-bottom:10px}
+.seg button{border:0;background:var(--panel);color:var(--accent);padding:7px 18px;font:inherit;font-weight:600;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--panel)}
+.exportbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.more{border:1px solid var(--line);background:var(--panel);color:var(--accent);border-radius:6px;width:34px;height:32px;font-size:18px;line-height:1;cursor:pointer;margin-left:6px;vertical-align:middle}
+.more:hover,.more[aria-expanded="true"]{border-color:var(--accent);background:var(--accent-soft)}
+td.c-act{white-space:nowrap}
+.mob-only{display:none!important}
+.ev.nm{background:var(--hl);border-color:var(--star)}
+th.sortable .thbtn{background:none;border:0;padding:0;margin:0;font:inherit;font-weight:inherit;color:inherit;cursor:pointer;white-space:nowrap}
+.thbtn:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+#popmenu{position:fixed;z-index:60;min-width:230px;background:var(--panel);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,20,50,.28);padding:6px;display:flex;flex-direction:column}
+#popmenu button{background:none;border:0;text-align:left;padding:10px 12px;font:inherit;color:var(--ink);border-radius:6px;cursor:pointer}
+#popmenu button:hover,#popmenu button:focus-visible{background:var(--accent-soft)}
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:70;max-width:min(580px,calc(100% - 24px));background:var(--navy);color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:10px;padding:10px 10px 10px 16px;display:flex;gap:12px;align-items:center;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.tundo{background:#fff;color:#002e5d;border:0;border-radius:6px;padding:6px 14px;font:inherit;font-weight:700;cursor:pointer}
+.tclose{background:none;border:0;color:#fff;font-size:22px;line-height:1;cursor:pointer;padding:0 6px}
+dialog{border:1px solid var(--line);border-radius:12px;padding:20px;max-width:min(520px,calc(100% - 24px));width:100%;background:var(--panel);color:var(--ink)}
+dialog::backdrop{background:rgba(0,15,40,.55)}
+dialog h2{margin:0 0 6px;font-size:18px}
+.days{border:0;padding:0;margin:12px 0;display:flex;gap:16px;flex-wrap:wrap}
+.days legend{font-weight:600;margin-bottom:6px;padding:0}
+.days label{display:flex;gap:6px;align-items:center}
+.row{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0}
+.row label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);flex:1;min-width:140px}
+input[type=time],input[type=number],input[type=text]{padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit}
+.err{color:var(--warn);min-height:1.3em;margin:6px 0}
+.dlgbtns{display:flex;gap:10px;flex-wrap:wrap}
+.foot{border-top:1px solid var(--line);padding:18px 0 40px;color:var(--muted);font-size:13px}
+.foot a{color:var(--accent)}
+.foot p{margin:0 0 10px;max-width:90ch}
+
+/* ---- phones: tables become cards ---- */
+@media (max-width:720px){
+  .stickyin,.wrap{padding-left:12px;padding-right:12px}
+  .tabbar{flex-wrap:nowrap;overflow-x:auto;gap:6px 12px;-webkit-overflow-scrolling:touch}
+  .tgroup{flex-wrap:nowrap}
+  .tgroup+.tgroup{border-left:2px solid var(--line);padding-left:12px}
+  .glabel{display:none}
+  .tab{white-space:nowrap;padding:9px 12px;font-size:14px}
+  .sumbar{font-size:13px;min-height:36px}
+  .mob-only{display:flex!important}
+  .tablewrap{border:0;background:none;overflow:visible}
+  table,tbody,tr,td{display:block;width:100%;min-width:0!important}
+  thead{display:none}
+  tr{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:10px;padding:10px 12px}
+  tr.sel{background:var(--accent-soft)}
+  td{border:0;padding:3px 0;white-space:normal}
+  td.time{white-space:normal}
+  td[data-label]::before{content:attr(data-label);display:inline-block;min-width:96px;color:var(--muted);font-size:12px;font-weight:600}
+  td.c-head{display:flex;align-items:center;font-size:16px}
+  td.c-main{font-weight:600;font-size:15px}
+  td.c-act{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;white-space:normal}
+  td.c-act .more{margin-left:0}
+  .star{font-size:26px;padding:6px 12px 6px 0}
+  button.add,.more,.btn{min-height:40px}
+  tr.detail{padding:0;border:0;background:none}
+  tr.detail td{padding:0}
+  input[type=search]{max-width:none;min-width:0;width:100%}
+  .controls{gap:8px}
+  .group li{gap:8px}
+  .sorthint{display:none}
+}
+
+/* ---- printing the schedule ---- */
+@media print{
+  .sticky,header,.skip,footer,#toast,#popmenu,.exportbar,.clear,button.add,.more,.lnk,.seg{display:none!important}
+  body{background:#fff;color:#000}
+  .wrap{max-width:none;padding:0}
+  #view::before{content:"Winter 2027 schedule";display:block;font-size:20px;font-weight:700;margin-bottom:8px}
+  .gwrap{overflow:visible}.grid{min-width:0}
+  .tablewrap{overflow:visible}
+  table{min-width:0}
+}
+
+/* ---- tuning: one-row tabs on desktop, compact sticky bar on phones ---- */
+.lines{display:inline-block;vertical-align:top}
+.cs{display:none}
+.tab{padding:7px 12px;font-size:14px}
+.tabbar{gap:6px 16px;padding-bottom:8px}
+.sumbar{padding:6px 0 4px;min-height:34px}
+@media (max-width:720px){
+  header{padding:14px 12px 12px}
+  h1{font-size:20px;margin-bottom:4px}
+  header p{font-size:13px}
+  .cl{display:none}.cs{display:inline}
+  .sumbar{flex-wrap:nowrap;justify-content:space-between;gap:8px}
+  .sumbar .btn.sm{white-space:nowrap;flex-shrink:0}
+  .sumtxt{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+  input[type=search]{flex:1 1 100%}
+  .fl{flex:1 1 44%;justify-content:space-between}
+  .fl select{flex:1;min-width:0}
+  td[data-label]::before{min-width:112px}
+  td[data-label]{display:flex;gap:6px;align-items:baseline}
+}
 </style>
 </head>
 <body>
+<a class="skip" href="#view">Skip to the class list</a>
 <header>
   <h1>Winter 2027 schedule planner</h1>
-  <p>Pick your MBA classes first. Then open <b>SWELL classes</b> to see only the SWELL activities that fit around them.</p>
-  <p style="margin-top:6px">Sections tagged <span class="tag warn" style="margin:0">Conflicts with 1st year core classes</span> overlap the 1st year core schedule (Tue/Thu 8:00–9:15, 9:30–10:45 and 12:30–1:45).</p>
-  <p style="margin-top:6px">Already taken a class? Click <b>Class already taken</b> on it. It then disappears from the lists and from the overlap warnings.</p>
-  <p style="margin-top:6px">Tap <b>☆</b> to save a class to your <b>Favorites</b> tab. Click <b>Not interested in this class</b> on a class you don't want to see: it's hidden everywhere and parked on the <b>Not for me</b> tab, where you can bring it back any time.</p>
+  <p>Browse MBA, SWELL and non-MBA classes, add the ones you want, and the planner flags conflicts and shows your week.</p>
+  <details id="howto">
+    <summary>How this works</summary>
+    <div class="howto">
+      <p><b>1.</b> Pick your MBA classes first with <b>Add</b>. Then open <b>SWELL classes</b> to see only the SWELL activities that fit around them. The bar under this header always shows your totals.</p>
+      <p><b>2.</b> Sections tagged <span class="tag warn" style="margin:0">Conflicts with 1st year core classes</span> overlap the 1st year core schedule (Tue/Thu 8:00–9:15, 9:30–10:45 and 12:30–1:45).</p>
+      <p><b>3.</b> Tap <b>☆</b> to save a class to <b>Favorites</b>. The <b>⋯</b> button on a class has <b>Class already taken</b> and <b>Not interested in this class</b>. Hidden classes go to the <b>Not for me</b> tab, and a message lets you undo right away.</p>
+      <p><b>4.</b> For non-MBA classes, use <b>Set my time</b> after checking your section on BYU MyMap, and they will count in your week and conflict checks.</p>
+      <p><b>5.</b> Everything is saved in this browser. Use the backup buttons at the bottom of the page to keep or move your picks.</p>
+    </div>
+  </details>
 </header>
-<div class="wrap">
-  <div class="tabs" role="tablist">
-    <button class="tab" role="tab" data-tab="all" aria-selected="true">MBA classes</button>
-    <button class="tab" role="tab" data-tab="slots" aria-selected="false">Classes by time</button>
-    <button class="tab" role="tab" data-tab="favs" aria-selected="false">Favorites<span class="badge fv" id="cntfav">0</span></button>
-    <button class="tab" role="tab" data-tab="mine" aria-selected="false">My schedule<span class="badge" id="cnt">0</span></button>
-    <button class="tab" role="tab" data-tab="fill" aria-selected="false">SWELL classes<span class="badge sw" id="cntsw">0</span></button>
-    <button class="tab" role="tab" data-tab="nonmba" aria-selected="false">Non-MBA classes</button>
-    <button class="tab" role="tab" data-tab="every" aria-selected="false">All classes</button>
-    <button class="tab" role="tab" data-tab="skip" aria-selected="false">Not for me<span class="badge sk" id="cntskip">0</span></button>
+<div id="sticky" class="sticky">
+  <div class="stickyin">
+    <div id="sumbar" class="sumbar"></div>
+    <div class="tabbar" role="tablist" aria-label="Sections">
+      <div class="tgroup" role="presentation"><span class="glabel" aria-hidden="true">Browse</span>
+        <button class="tab" role="tab" id="tab-all" aria-controls="view" data-tab="all" aria-selected="true">MBA classes</button>
+        <button class="tab" role="tab" id="tab-fill" aria-controls="view" data-tab="fill" aria-selected="false">SWELL classes<span class="badge sw" id="cntsw">0</span></button>
+        <button class="tab" role="tab" id="tab-nonmba" aria-controls="view" data-tab="nonmba" aria-selected="false">Non-MBA classes</button>
+        <button class="tab" role="tab" id="tab-every" aria-controls="view" data-tab="every" aria-selected="false">All classes</button>
+      </div>
+      <div class="tgroup" role="presentation"><span class="glabel" aria-hidden="true">Mine</span>
+        <button class="tab" role="tab" id="tab-mine" aria-controls="view" data-tab="mine" aria-selected="false">My schedule<span class="badge" id="cnt">0</span></button>
+        <button class="tab" role="tab" id="tab-favs" aria-controls="view" data-tab="favs" aria-selected="false">Favorites<span class="badge fv" id="cntfav">0</span></button>
+        <button class="tab" role="tab" id="tab-skip" aria-controls="view" data-tab="skip" aria-selected="false">Not for me<span class="badge sk" id="cntskip">0</span></button>
+      </div>
+    </div>
   </div>
-  <div id="view"></div>
 </div>
+<div class="wrap">
+  <div id="view" role="tabpanel" aria-labelledby="tab-all" tabindex="-1"></div>
+</div>
+<footer class="foot">
+  <div class="stickyin">
+    <p>Class data is for Winter 2027. Non-MBA classes come from BYU Class Search (commtech.byu.edu); MBA and SWELL sections come from the lists this planner was built with. Always confirm times and rooms on <a href="https://commtech.byu.edu/auth/mymap/" target="_blank" rel="noopener">BYU MyMap</a> before you register.</p>
+    <p>Your picks are saved only in this browser. <button class="btn sm" data-backup="1">Download a backup</button> <button class="btn sm" data-restore="1">Restore from a backup</button></p>
+  </div>
+</footer>
+<input type="file" id="restorefile" accept="application/json,.json" hidden>
+<dialog id="nmdlg" aria-labelledby="nmTitle">
+  <form id="nmform" method="dialog" novalidate>
+    <h2 id="nmTitle"></h2>
+    <p id="nmHint" class="sub"></p>
+    <fieldset class="days"><legend>Days</legend>
+      <label><input type="checkbox" name="nmday" value="M"> Mon</label>
+      <label><input type="checkbox" name="nmday" value="T"> Tue</label>
+      <label><input type="checkbox" name="nmday" value="W"> Wed</label>
+      <label><input type="checkbox" name="nmday" value="R"> Thu</label>
+      <label><input type="checkbox" name="nmday" value="F"> Fri</label>
+    </fieldset>
+    <div class="row"><label>Start time<input type="time" id="nmStart"></label><label>End time<input type="time" id="nmEnd"></label></div>
+    <div class="row"><label>Credits (optional)<input type="number" id="nmCr" min="0" max="9" step="0.5"></label><label>Room (optional)<input type="text" id="nmRoom" maxlength="60"></label></div>
+    <p id="nmErr" class="err" role="alert"></p>
+    <div class="dlgbtns"><button type="submit" class="btn primary">Save and add to my schedule</button><button type="button" class="btn" id="nmRemove">Remove my time</button><button type="button" class="btn" id="nmCancel">Cancel</button></div>
+  </form>
+</dialog>
+<div id="popmenu" role="menu" aria-label="More actions" hidden></div>
+<div id="toast" hidden></div>
+<div id="live" class="sr-only" aria-live="polite"></div>
 
 <script>
 const TITLES={102:"Meditation",103:"STRONG Nation",104:"Cardio Fitness",105:"Pickleball",107:"Pilates",108:"Zumba",109:"Yoga",110:"Indoor Cycling",111:"Basketball, Beginning",112:"Basketball, Intermediate",113:"Ultimate Frisbee",114:"Barre",115:"Recess and Lawn Games",116:"Bowling, Beginning",117:"Bowling, Intermediate",120:"Indoor Rock Climbing",121:"Diving, Springboard",125:"Functional Fitness",131:"Golf, Beginning",132:"Golf, Intermediate",136:"Gymnastics, Beginning",139:"Running",141:"Martial Arts",146:"Racquetball, Beginning",147:"Racquetball, Intermediate",150:"Ice Skating, Beginning",151:"Ice Hockey, Beginning",152:"Ice Skating, Intermediate",153:"Ice Hockey, Intermediate",155:"Self-Defense",156:"Soccer, Beginning",157:"Soccer, Intermediate",161:"Skiing",162:"Snowboarding",164:"Skiing, Cross-Country",170:"Swimming for Non-Swimmers",171:"Swimming, Beginning",172:"Swimming, Intermediate",175:"Scuba Diving, Beginning",176:"Scuba Diving, Intermediate",179:"Aqua Fitness",181:"Tennis, Beginning",182:"Tennis, Intermediate",186:"Volleyball, Beginning",187:"Volleyball, Intermediate",191:"Weight Training"};
@@ -402,12 +562,12 @@ const S=RAW.trim().split("\n").map((l,i)=>{
   return {id:1000+i,kind:"swell",num:c,sec,key:c+"-"+sec,code:"SWELL "+c+"-"+sec,name:TITLES[c],prof:ins,cr:0.5,
     days:online?"":DMAP[d],online,s:online?null:hm(+st),e:online?null:hm(+en),room:b,open,seats:size,blk:blk||""};
 });
-const A=id=>id<1000?C[id]:S[id-1000];
+const A=id=>id<1000?C[id]:id<2000?S[id-1000]:NM[id-2000].sch;
 
 const DN={M:"Mon",T:"Tue",W:"Wed",R:"Thu",F:"Fri"};
 const DORDER="MTWRF";
 const fmt=m=>{let h=Math.floor(m/60);const mm=m%60;const ap=h>=12?"pm":"am";h=h%12||12;return h+":"+String(mm).padStart(2,"0")+ap};
-const pat=c=>c.days==="MW"?"Mon/Wed":c.days==="TR"?"Tue/Thu":DN[c.days]||c.days;
+const pat=c=>c.days==="MW"?"Mon/Wed":c.days==="TR"?"Tue/Thu":[...c.days].map(d=>DN[d]||d).join("/");
 const timeStr=c=>c.online?"Online (no set time)":pat(c)+" "+fmt(c.s)+"–"+fmt(c.e);
 const dayRank=c=>c.online?9:Math.min(...[...c.days].map(d=>DORDER.indexOf(d)));
 const blkOk=(a,b)=>a.blk===""||b.blk===""||a.blk===b.blk;
@@ -438,10 +598,11 @@ try{const v=JSON.parse(localStorage.getItem("swell-sel")||"[]");if(Array.isArray
 [...sel].forEach(i=>{if(isDone(A(i))||isSkip(A(i)))sel.delete(i)});
 const save=()=>{
   try{localStorage.setItem("mba-sel",JSON.stringify([...sel].filter(i=>i<1000)))}catch(e){}
-  try{localStorage.setItem("swell-sel",JSON.stringify([...sel].filter(i=>i>=1000).map(i=>A(i).key)))}catch(e){}
+  try{localStorage.setItem("swell-sel",JSON.stringify([...sel].filter(i=>i>=1000&&i<2000).map(i=>A(i).key)))}catch(e){}
+  try{localStorage.setItem("nm-sel",JSON.stringify([...sel].filter(i=>i>=2000).map(i=>NM[i-2000].key)))}catch(e){}
 };
 
-let nQ="",nDept="",nLvl="";
+let nQ="",nDept="",nLvl="",todF="",crF="",mbaMode="table",CL=new Set();
 let tab="all",q="",dayF="",sortK="time",sortDir=1,hideFull=false,focusId=null,open=new Set();
 // SWELL tab state
 let showDone=false;
@@ -463,8 +624,90 @@ const doneCtl=()=>`<label class="chk"><input type="checkbox" id="showdone" ${sho
 const blkTxt=b=>b==="1st"?"1st block · Jan 6–Feb 24":b==="2nd"?"2nd block · Feb 25–Apr 14":"";
 const fmtCr=n=>Number.isInteger(n)?String(n):n.toFixed(1);
 
-const sortTh=(k,l,on,dir,attr)=>`<th ${attr}="${k}" class="sortable ${on?"on":""}" title="Click to sort by ${esc(l)}">${esc(l)}<span class="sortic">${on?(dir>0?"▲":"▼"):"⇅"}</span></th>`;
+const sortTh=(k,l,on,dir,attr)=>`<th ${attr}="${k}" class="sortable ${on?"on":""}" aria-sort="${on?(dir>0?"ascending":"descending"):"none"}"><button type="button" class="thbtn" ${attr}="${k}" title="Sort by ${esc(l)}">${esc(l)}<span class="sortic" aria-hidden="true">${on?(dir>0?"▲":"▼"):"⇅"}</span></button></th>`;
 const SORTHINT=`<div class="sorthint">⇅ Click any column heading to sort the table</div>`;
+
+// ---- shared helpers: toast, "more actions" menu, filters, buttons
+const keyLabel=k=>k.startsWith("s:")?"SWELL "+(TITLES[k.slice(2)]||k.slice(2)):k.slice(2).split("|").join(" ");
+let toastTimer=null,toastUndo=null;
+function announce(msg){const l=document.getElementById("live");if(l){l.textContent="";setTimeout(()=>{l.textContent=msg},30)}}
+function toast(msg,undo){
+  const t=document.getElementById("toast");
+  toastUndo=undo||null;
+  t.innerHTML=`<span class="tmsg">${esc(msg)}</span>${undo?`<button class="tundo" data-toastundo="1">Undo</button>`:""}<button class="tclose" data-toastclose="1" aria-label="Dismiss message">×</button>`;
+  t.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(hideToast,9000);announce(msg);
+}
+function hideToast(){const t=document.getElementById("toast");if(t){t.hidden=true;t.innerHTML=""}toastUndo=null;clearTimeout(toastTimer)}
+function toggleDone(k){
+  if(done.has(k)){done.delete(k);saveDone();save();announce("Back in the lists: "+keyLabel(k));return}
+  const removed=[...sel].filter(i=>doneKey(A(i))===k);
+  done.add(k);removed.forEach(i=>sel.delete(i));saveDone();save();
+  toast("Marked as already taken: "+keyLabel(k),()=>{done.delete(k);removed.forEach(i=>sel.add(i));saveDone();save()});
+}
+function toggleSkip(k){
+  if(skips.has(k)){skips.delete(k);saveSkip();announce("Brought back: "+keyLabel(k));return}
+  const removed=[...sel].filter(i=>doneKey(A(i))===k),wasFav=favs.has(k);
+  skips.add(k);favs.delete(k);removed.forEach(i=>sel.delete(i));saveFav();saveSkip();save();
+  toast("Hidden: "+keyLabel(k),()=>{skips.delete(k);if(wasFav)favs.add(k);removed.forEach(i=>sel.add(i));saveFav();saveSkip();save()});
+}
+let menuBtn=null;
+function closeMenu(refocus){
+  const m=document.getElementById("popmenu");
+  if(m&&!m.hidden){m.hidden=true;m.innerHTML=""}
+  if(menuBtn){menuBtn.setAttribute("aria-expanded","false");if(refocus&&document.contains(menuBtn))menuBtn.focus()}
+  menuBtn=null;
+}
+function openMenuFor(btn){
+  const k=btn.dataset.menu,m=document.getElementById("popmenu");
+  const nm=k.startsWith("n:")?NMKEY[k]:null;
+  m.innerHTML=(nm?`<button role="menuitem" data-nmtime="${esc(k)}">${nm.sch?"Change my time…":"Set my time…"}</button>`:"")+
+    `<button role="menuitem" data-done="${esc(k)}">${done.has(k)?"Undo class already taken":"Class already taken"}</button>`+
+    `<button role="menuitem" data-skip="${esc(k)}">${skips.has(k)?"Bring this class back":"Not interested in this class"}</button>`;
+  m.hidden=false;menuBtn=btn;btn.setAttribute("aria-expanded","true");
+  const r=btn.getBoundingClientRect(),mw=m.offsetWidth,mh=m.offsetHeight;
+  m.style.left=Math.max(8,Math.min(r.right-mw,window.innerWidth-mw-8))+"px";
+  m.style.top=(r.bottom+4+mh>window.innerHeight-8?Math.max(8,r.top-mh-4):r.bottom+4)+"px";
+  m.querySelector("button").focus();
+}
+const moreBtn=(k,label)=>`<button class="more" data-menu="${esc(k)}" aria-haspopup="menu" aria-expanded="false" aria-label="More actions for ${esc(label)}" title="More actions">⋯</button>`;
+const addBtn=(x,cls)=>{const on=sel.has(x.id);return `<button class="add${cls?" "+cls:""}" data-add="${x.id}" aria-pressed="${on}" aria-label="Add ${esc(lbl(x))} to my schedule">${on?"Added":"Add"}</button>`};
+const doneTag=`<span class="tag ok">Already taken</span>`;
+
+const TODS={morning:[0,720],afternoon:[720,1020],evening:[1020,1440]};
+const crOf=x=>x.kind==="nonmba"?(NMC[x.key]&&NMC[x.key].cr!=null?NMC[x.key].cr:null):x.cr;
+const daysOf=x=>x.kind==="nonmba"?(x.sch?x.sch.days:nmLetters(x.days)):(x.days||"");
+const rangesOf=x=>x.kind==="nonmba"?(x.sch?[[x.sch.s,x.sch.e]]:nmRanges(x.time)):(x.online||x.s==null?[]:[[x.s,x.e]]);
+function passCommon(x,o){
+  if(o.day&&dayF&&!daysOf(x).includes(dayF))return false;
+  if(o.tod&&todF){const [lo,hi]=TODS[todF];if(!rangesOf(x).some(([a,b])=>a<hi&&b>lo))return false}
+  if(o.cr&&crF){const c=crOf(x);if(c==null)return false;if(crF==="lt2"?!(c<2):crF==="2"?c!==2:!(c>=3))return false}
+  if(o.full&&hideFull){if(x.kind==="mba"&&x.seats<10)return false;if(x.kind==="swell"&&x.open<=0)return false}
+  return true;
+}
+const anyFilter=scope=>!!(q||dayF||todF||(scope!=="nm"&&(crF||hideFull))||(scope!=="mba"&&nDept)||(scope==="nm"&&nLvl)||(scope==="every"&&eTy));
+function ctrl(scope,count){
+  const opt=(id,label,list,val)=>`<label class="fl">${label} <select id="${id}">${list.map(([v,t])=>`<option value="${v}" ${val===v?"selected":""}>${esc(t)}</option>`).join("")}</select></label>`;
+  const days=[["","Any"],...[...DORDER].map(d=>[d,DN[d]])];
+  const tods=[["","Any"],["morning","Morning"],["afternoon","Afternoon"],["evening","Evening"]];
+  const crs=[["","Any"],["lt2","Under 2"],["2","2"],["3","3 or more"]];
+  const depts=[["","All"],...Object.keys(DEPT).map(d=>[d,d+" – "+DEPT[d]])];
+  const sid=scope==="mba"?"q":scope==="nm"?"nq":"eq";
+  const ph=scope==="mba"?"Search code, name, professor, room":scope==="nm"?"Search code, name, professor":"Search any class, professor or room";
+  let h=`<div class="controls"><input type="search" id="${sid}" placeholder="${ph}" value="${esc(q)}" aria-label="${ph}">`;
+  if(scope==="every")h+=opt("etype","Type",[["","All"],["MBA","MBA"],["SWELL","SWELL"],["Non-MBA","Non-MBA"]],eTy);
+  h+=opt("day","Day",days,dayF)+opt("tod","Time of day",tods,todF);
+  if(scope!=="mba")h+=opt("ndept","Dept",depts,nDept);
+  if(scope==="nm")h+=opt("nlvl","Level",[["","All"],["400","300/400"],["500","500/600"]],nLvl);
+  if(scope!=="nm")h+=opt("crsel","Credits",crs,crF);
+  if(scope!=="nm")h+=`<label class="chk"><input type="checkbox" id="full" ${hideFull?"checked":""}> Hide full or nearly full classes</label>`;
+  if(scope!=="nm"){
+    const keys=scope==="mba"?[["time","Time"],["code","Code"],["name","Class"],["prof","Professor"],["seats","Seats"]]:[["type","Type"],["code","Code"],["name","Class"],["prof","Professor"],["time","Days & time"]];
+    const cur=scope==="mba"?sortK:eK;
+    h+=`<label class="fl mob-only">Sort by <select id="msort">${keys.map(([v,t])=>`<option value="${v}" ${cur===v?"selected":""}>${t}</option>`).join("")}</select></label>`;
+  }
+  h+=`${done.size?doneCtl():""}${anyFilter(scope)?`<button class="clear" style="margin-left:0" data-clearf="1">Clear filters</button>`:""}<span class="sub" aria-live="polite">${count}</span></div>`;
+  return h;
+}
 
 function sorted(list){
   const k={time:c=>[dayRank(c),c.online?0:c.s],
@@ -479,20 +722,20 @@ function sorted(list){
 function filtered(){
   const t=q.toLowerCase();
   return C.filter(c=>(!t||(c.code+c.name+c.prof+c.room).toLowerCase().includes(t))
-    &&(!dayF||c.days.includes(dayF))&&(!hideFull||c.seats>=10)&&vis(c));
+    &&passCommon(c,{day:1,tod:1,cr:1,full:1})&&vis(c));
 }
 
 function rowHTML(c,cl){
   const on=sel.has(c.id);
-  const ov=overOf(c).length,dn=isDone(c),dk=esc(doneKey(c));
+  const ov=overOf(c).length,dn=isDone(c),dk=doneKey(c);
   return `<tr class="${on?"sel":""} ${cl.has(c.id)?"clash":""} ${dn?"done":""}" id="r${c.id}">
-    <td>${starBtn(dk)}<span class="code">${esc(c.code)}</span></td>
-    <td>${esc(c.name)}<div class="sub">${esc(c.room)} · ${c.cr} cr · ${c.seats} seats</div>
+    <td class="c-head">${starBtn(dk)}<span class="code">${esc(c.code)}</span></td>
+    <td class="c-main">${esc(c.name)}<div class="sub">${esc(c.room)} · ${c.cr} cr · ${c.seats} seats</div>
       ${c.note?c.note.split(/ (?=℀)/).map(n=>`<span class="tag">${esc(n)}</span>`).join(""):""}${coreTag(c)}</td>
-    <td>${esc(c.prof)}</td>
-    <td class="time">${esc(timeStr(c))}</td>
-    <td>${dn?`<span class="none">–</span>`:ov?`<button class="ovl" data-ov="${c.id}" aria-expanded="${open.has(c.id)}">${ov} overlap${ov>1?"s":""} ${open.has(c.id)?"▴":"▾"}</button>`:`<span class="none">none</span>`}</td>
-    <td>${dn?`<span class="tag ok">Already taken</span>`:`<button class="add" data-add="${c.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}<div class="lnks"><button class="lnk" data-done="${dk}">${dn?"Undo class already taken":"Class already taken"}</button><button class="lnk" data-skip="${dk}">Not interested in this class</button></div></td></tr>`+(open.has(c.id)&&!dn?detailHTML(c):"");
+    <td data-label="Professor">${esc(c.prof)}</td>
+    <td class="time" data-label="Time">${esc(timeStr(c))}</td>
+    <td data-label="Same time as">${dn?`<span class="none">–</span>`:ov?`<button class="ovl" data-ov="${c.id}" aria-expanded="${open.has(c.id)}">${ov} overlap${ov>1?"s":""} ${open.has(c.id)?"▴":"▾"}</button>`:`<span class="none">none</span>`}</td>
+    <td class="c-act">${dn?doneTag:addBtn(c)}${moreBtn(dk,lbl(c))}</td></tr>`+(open.has(c.id)&&!dn?detailHTML(c):"");
 }
 
 function detailHTML(c){
@@ -528,17 +771,11 @@ function allView(){
     focusNote=`<div class="note">Showing <b>${esc(f.code)} ${esc(f.name)}</b> (${esc(timeStr(f))}) and the ${fo.length} section${fo.length>1?"s":""} that overlap it. <button class="ovl" data-clearfocus="1">Show all classes</button></div>`;
   }
   const th=(k,l)=>sortTh(k,l,sortK===k,sortDir,"data-sort");
-  return `${focusNote}
-  <div class="controls">
-    <input type="search" id="q" placeholder="Search code, name, professor, room" value="${esc(q)}" aria-label="Search classes">
-    <select id="day" aria-label="Filter by day">
-      <option value="">All days</option>
-      ${[...DORDER].map(d=>`<option value="${d}" ${dayF===d?"selected":""}>${DN[d]}</option>`).join("")}
-    </select>
-    <label class="chk"><input type="checkbox" id="full" ${hideFull?"checked":""}> Hide sections under 10 seats</label>
-    ${done.size?doneCtl():""}
-    <span class="sub">${list.length} of ${C.filter(vis).length} shown</span>
-  </div>
+  const seg=`<div class="seg" role="group" aria-label="MBA classes layout"><button data-mode="table" aria-pressed="${mbaMode==="table"}">Table</button><button data-mode="time" aria-pressed="${mbaMode==="time"}">By time</button></div>`;
+  const controls=ctrl("mba",`${list.length} of ${C.filter(vis).length} shown`);
+  if(mbaMode==="time")return `${seg}${controls}`+slotsView();
+  return `${focusNote}${seg}
+  ${controls}
   ${SORTHINT}
   <div class="tablewrap"><table>
     <thead><tr>${th("code","Code")}${th("name","Class")}${th("prof","Professor")}${th("time","Time")}<th style="cursor:default">Same time as</th><th style="cursor:default"></th></tr></thead>
@@ -551,19 +788,19 @@ function allView(){
 
 function slotsView(){
   const groups={};
-  C.filter(vis).forEach(c=>{const k=c.days+"|"+c.s+"|"+c.e;(groups[k]=groups[k]||[]).push(c)});
+  filtered().forEach(c=>{const k=c.days+"|"+c.s+"|"+c.e;(groups[k]=groups[k]||[]).push(c)});
   const keys=Object.keys(groups).sort((a,b)=>{
     const [da,sa]=a.split("|"),[db,sb]=b.split("|");
     const o=x=>Math.min(...[...x].map(d=>DORDER.indexOf(d)));
     return (o(da)-o(db))||(+sa-+sb)||a.localeCompare(b)});
-  let html=`<div class="note">Each box is one exact meeting time. Classes in the same box directly conflict. Classes that only partly overlap (for example a 2:00–2:50 class and a 2:00–3:15 class) are marked in the "Same time as" column on the MBA classes tab.</div>`+(done.size?`<div class="controls">${doneCtl()}</div>`:"");
+  let html=`<div class="note">Each box is one exact meeting time. Classes in the same box directly conflict. Classes that only partly overlap (for example a 2:00–2:50 class and a 2:00–3:15 class) are marked in the "Same time as" column on the MBA classes table.</div>`;
   let lastDay="";
   keys.forEach(k=>{
     const g=groups[k],c0=g[0];
     if(c0.days!==lastDay){lastDay=c0.days;html+=`<h2 class="daytitle">${pat(c0)}</h2>`}
     html+=`<div class="group"><h3>${fmt(c0.s)}–${fmt(c0.e)}<span>${g.length} section${g.length>1?"s":""}</span></h3><ul>`+
       g.map(c=>`<li>${starBtn(doneKey(c))}<span class="code" style="min-width:92px">${esc(c.code)}</span><span class="nm">${esc(c.name)}<div class="sub">${esc(c.prof)} · ${esc(c.room)}</div>${coreTag(c)}</span>
-      ${isDone(c)?`<span class="tag ok">Already taken</span>`:`<button class="add" data-add="${c.id}" aria-pressed="${sel.has(c.id)}">${sel.has(c.id)?"Added":"Add"}</button>`}<button class="lnk" data-done="${esc(doneKey(c))}">${isDone(c)?"Undo class already taken":"Class already taken"}</button><button class="lnk" data-skip="${esc(doneKey(c))}">Not interested in this class</button></li>`).join("")+`</ul></div>`;
+      ${isDone(c)?doneTag:addBtn(c)}${moreBtn(doneKey(c),lbl(c))}</li>`).join("")+`</ul></div>`;
   });
   return html;
 }
@@ -591,14 +828,15 @@ function conflictNote(pairs,summary){
 }
 
 function mineView(){
-  if(!sel.size)return `<div class="note empty">No classes added yet. Use the Add buttons on the MBA classes tab and your week will appear here. Once your MBA classes are in, the SWELL classes tab shows activities that fit around them.</div>`;
+  if(!sel.size)return `<div class="note empty">No classes added yet. Use the Add buttons on any class tab and your week will appear here. Once your MBA classes are in, the SWELL classes tab shows activities that fit around them.</div>`;
   const items=selItems();
-  const mba=items.filter(x=>x.kind==="mba"),sw=items.filter(x=>x.kind==="swell");
+  const mba=items.filter(x=>x.kind==="mba"),sw=items.filter(x=>x.kind==="swell"),nmi=items.filter(x=>x.kind==="nonmba");
   const cl=clashIds();
   const pairs=pairsOf(items);
   const mcr=mba.reduce((s,c)=>s+c.cr,0),scr=sw.length*0.5;
-  const summary=`${mba.length} MBA class${mba.length===1?"":"es"} (${fmtCr(mcr)} credit hours)`+(sw.length?` + ${sw.length} SWELL (${fmtCr(scr)} credit hours)`:"");
-  let html=pairs.length?conflictNote(pairs,summary):`<div class="note ok"><b>No conflicts.</b> ${summary}.</div>`;
+  const ncr=nmi.reduce((s,c)=>s+(c.cr||0),0),nmiss=nmi.filter(c=>c.cr==null).length;
+  const summary=`${mba.length} MBA class${mba.length===1?"":"es"} (${fmtCr(mcr)} credit hours)`+(sw.length?` + ${sw.length} SWELL (${fmtCr(scr)} credit hours)`:"")+(nmi.length?` + ${nmi.length} non-MBA${nmiss?` (${nmiss} without credits entered)`:` (${fmtCr(ncr)} credit hours)`}`:"");
+  let html=exportBar()+(pairs.length?conflictNote(pairs,summary):`<div class="note ok"><b>No conflicts.</b> ${summary}.</div>`);
   const timed=items.filter(x=>!x.online);
   const START=Math.min(480,...timed.map(x=>Math.floor(x.s/60)*60)),END=Math.max(1140,...timed.map(x=>Math.ceil(x.e/60)*60)),PX=0.9;
   const H=(END-START)*PX,NH=(END-START)/60;
@@ -611,18 +849,19 @@ function mineView(){
         const w=100/n;
         const second=c.kind==="swell"?`${fmt(c.s)}–${fmt(c.e)}${c.blk?" · "+c.blk+" blk":""}`:`${fmt(c.s)}–${fmt(c.e)}`;
         const head=c.kind==="swell"?`<b>${esc(c.name)}</b>`:`<b>${esc(c.code)}</b>${esc(c.name)}<br>`;
-        return `<div class="ev ${c.kind==="swell"?"sw":""} ${cl.has(c.id)?"clash":""}" title="${esc(lbl(c))}" style="top:${(c.s-START)*PX}px;height:${(c.e-c.s)*PX-2}px;left:calc(${lane*w}% + 1px);width:calc(${w}% - 2px)">${head}${second}</div>`}).join("")+`</div>`;
+        return `<div class="ev ${c.kind==="swell"?"sw":c.kind==="nonmba"?"nm":""} ${cl.has(c.id)?"clash":""}" title="${esc(lbl(c))}" style="top:${(c.s-START)*PX}px;height:${(c.e-c.s)*PX-2}px;left:calc(${lane*w}% + 1px);width:calc(${w}% - 2px)">${head}${second}</div>`}).join("")+`</div>`;
   });
   const tc=`<div class="timecol" style="height:${H}px">`+Array.from({length:NH},(_,i)=>{const h=START/60+i;return `<div class="hr" style="top:${i*60*PX}px">${h%12||12}${h>=12?"p":"a"}</div>`}).join("")+`</div>`;
   html+=`<div class="gwrap"><div class="grid"><div class="gh"></div>${[..."MTWRF"].map(d=>`<div class="gh">${DN[d]}</div>`).join("")}${tc}${cols}</div></div>`;
-  html+=`<div class="legend"><span><span class="dot" style="background:var(--accent-soft);border:1px solid var(--accent)"></span>MBA</span><span><span class="dot" style="background:var(--ok-soft);border:1px solid var(--ok)"></span>SWELL</span><span><span class="dot" style="background:var(--warn-soft);border:1px solid var(--warn)"></span>Conflict</span>`+
+  html+=`<div class="legend"><span><span class="dot" style="background:var(--accent-soft);border:1px solid var(--accent)"></span>MBA</span><span><span class="dot" style="background:var(--ok-soft);border:1px solid var(--ok)"></span>SWELL</span>${nmi.length?`<span><span class="dot" style="background:var(--hl);border:1px solid var(--star)"></span>Non-MBA</span>`:""}<span><span class="dot" style="background:var(--warn-soft);border:1px solid var(--warn)"></span>Conflict</span>`+
     (mba.length?`<button class="ovl go" data-tab="fill">Find SWELL for your open time</button>`:"")+
     (sw.length?`<button class="clear" data-clearsw="1" style="margin-left:auto">Remove all SWELL</button><button class="clear" style="margin-left:0" data-clearall="1">Remove all</button>`:`<button class="clear" data-clearall="1">Remove all</button>`)+`</div>`;
   if(sw.some(x=>x.online))html+=`<div class="sub" style="margin-bottom:8px">Online SWELL sections have no set meeting time, so they are listed below but not drawn on the week.</div>`;
-  const th=`<th style="cursor:default">Code</th><th style="cursor:default">Class</th><th style="cursor:default">Professor</th><th style="cursor:default">Time</th><th style="cursor:default"></th>`;
-  const row=c=>`<tr class="${cl.has(c.id)?"clash":""}"><td class="code">${esc(c.code)}</td><td>${esc(c.name)}<div class="sub">${esc(c.kind==="swell"?swWhere(c):c.room)}</div>${c.blk?`<span class="tag">${esc(blkTxt(c.blk))}</span>`:""}${coreTag(c)}</td><td>${esc(c.prof||"TBA")}</td><td class="time">${esc(timeStr(c))}</td><td><button class="add ${c.kind==="swell"?"sw":""}" data-add="${c.id}" aria-pressed="true">Remove</button></td></tr>`;
+  const th=`<th style="cursor:default">Code</th><th style="cursor:default">Class</th><th style="cursor:default">Professor</th><th style="cursor:default">Time</th><th style="cursor:default"><span class="sr-only">Actions</span></th>`;
+  const row=c=>`<tr class="${cl.has(c.id)?"clash":""}"><td class="c-head code">${esc(c.code)}</td><td class="c-main">${esc(c.name)}<div class="sub">${esc(c.kind==="swell"?swWhere(c):c.room||"")}</div>${c.blk?`<span class="tag">${esc(blkTxt(c.blk))}</span>`:""}${coreTag(c)}</td><td data-label="Professor">${esc(c.prof||"TBA")}</td><td class="time" data-label="Time">${esc(timeStr(c))}</td><td class="c-act"><button class="add ${c.kind==="swell"?"sw":""}" data-add="${c.id}" aria-pressed="true" aria-label="Remove ${esc(lbl(c))} from my schedule">Remove</button>${c.kind==="nonmba"?`<button class="lnk" data-nmtime="${esc(c.key)}">Change my time</button>`:""}</td></tr>`;
   if(mba.length)html+=`<div class="tablewrap"><table><thead><tr>${th}</tr></thead><tbody>${sorted(mba).map(row).join("")}</tbody></table></div>`;
   if(sw.length)html+=`<h2 class="daytitle">SWELL</h2><div class="tablewrap"><table><thead><tr>${th}</tr></thead><tbody>${sorted(sw).map(row).join("")}</tbody></table></div>`;
+  if(nmi.length)html+=`<h2 class="daytitle">Non-MBA</h2><div class="tablewrap"><table><thead><tr>${th}</tr></thead><tbody>${sorted(nmi).map(row).join("")}</tbody></table></div>`;
   return html;
 }
 
@@ -671,12 +910,12 @@ function swRow(x){
   return `<li class="${on?"sel":""}"><span class="code" style="min-width:48px">${esc(x.sec)}</span>
     <span class="nm">${esc(timeStr(x))}<div class="sub">${esc(x.online?"Online":swWhere(x))} · ${esc(x.prof||"Instructor TBA")} · ${seats}</div>${mbaNote}
     ${coreTag(x)}${x.blk?`<span class="tag">${esc(blkTxt(x.blk))}</span>`:""}${cf.length?`<span class="tag warn">Conflicts with ${esc(cf.map(o=>o.code).join(", "))}</span>`:""}</span>
-    ${isDone(x)?`<span class="tag ok">Already taken</span>`:`<button class="add sw" data-add="${x.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}</li>`;
+    ${isDone(x)?doneTag:addBtn(x,"sw")}</li>`;
 }
 
 function fillView(){
   const items=selItems();
-  const mba=items.filter(x=>x.kind==="mba"),sw=items.filter(x=>x.kind==="swell");
+  const mba=items.filter(x=>x.kind!=="swell"),sw=items.filter(x=>x.kind==="swell");
   const pairs=pairsOf(items);
   let html="";
   if(pairs.length)html+=conflictNote(pairs,"");
@@ -874,18 +1113,53 @@ const NM=NM_RAW.split("\n").map(l=>{
 }).sort((a,b)=>DORD.indexOf(a.dept)-DORD.indexOf(b.dept)||numOf(a.code)-numOf(b.code)||a.code.localeCompare(b.code));
 const NMWARN=`<div class="sub nmwarn">This class has many sections. Please visit <a href="https://commtech.byu.edu/auth/mymap/" target="_blank" rel="noopener">BYU MyMap</a> for the correct information.</div>`;
 const nmProb=x=>x.time.includes("(multiple)")||x.days.includes("/");
+// ---- Non-MBA scheduling: a time is read from the list when a class has one clean meeting pattern, or entered by you
+NM.forEach((x,i)=>{x.id=2000+i;x.key=doneKey(x)});
+const NMKEY={};NM.forEach(x=>NMKEY[x.key]=x);
+const NMDAY={Th:"R",M:"M",T:"T",W:"W",F:"F"};
+const nmLetters=t=>[...new Set((t.match(/Th|M|T|W|F/g)||[]).map(d=>NMDAY[d]))].sort((a,b)=>DORDER.indexOf(a)-DORDER.indexOf(b)).join("");
+const tmin=(h,m,ap)=>((+h%12)+(ap==="PM"?12:0))*60+(+m);
+function nmRanges(t){
+  return t.replace(" (multiple)","").split(" / ").map(seg=>{
+    const m=seg.trim().match(/^(\d{1,2}):(\d{2})\s*(AM|PM)?\s*[–-]\s*(\d{1,2}):(\d{2})\s*(AM|PM)$/);
+    if(!m)return null;
+    const [,h1,m1,a1,h2,m2,a2]=m;
+    let st=tmin(h1,m1,a1||a2);const en=tmin(h2,m2,a2);
+    if(!a1&&st>en)st-=720;
+    return [st,en];
+  }).filter(Boolean);
+}
+function nmAuto(x){
+  if(nmProb(x)||x.time==="TBD"||x.days==="TBD")return null;
+  const d=nmLetters(x.days),r=nmRanges(x.time);
+  return d&&r.length===1&&r[0][1]>r[0][0]?{days:d,s:r[0][0],e:r[0][1]}:null;
+}
+let NMC={};
+try{const v=JSON.parse(localStorage.getItem("nm-custom")||"{}");
+  if(v&&typeof v==="object"&&!Array.isArray(v))Object.keys(v).forEach(k=>{const c=v[k];
+    if(NMKEY[k]&&c&&typeof c.days==="string"&&Number.isFinite(c.s)&&Number.isFinite(c.e)&&c.e>c.s&&c.days.replace(/[^MTWRF]/g,"")){
+      NMC[k]={days:c.days.replace(/[^MTWRF]/g,""),s:c.s,e:c.e,cr:Number.isFinite(c.cr)?c.cr:null,room:typeof c.room==="string"?c.room.slice(0,60):""}}})}catch(e){}
+const saveNmc=()=>{try{localStorage.setItem("nm-custom",JSON.stringify(NMC))}catch(e){}};
+function refreshNm(x){
+  const c=NMC[x.key],a=c?null:nmAuto(x),t=c||a;
+  x.custom=!!c;x.auto=!!a;
+  x.sch=t?{id:x.id,kind:"nonmba",code:x.code,name:x.name,prof:x.prof==="TBD"?"":x.prof.replace(/ \/ /g,", "),days:t.days,s:t.s,e:t.e,online:false,blk:"",room:c?c.room:(a?x.loc:""),cr:c&&c.cr!=null?c.cr:null,key:x.key,nm:x}:null;
+}
+NM.forEach(refreshNm);
+try{const v=JSON.parse(localStorage.getItem("nm-sel")||"[]");if(Array.isArray(v))v.forEach(k=>{const x=NMKEY[k];if(x&&x.sch&&!isDone(x)&&!isSkip(x))sel.add(x.id)})}catch(e){}
 const nmTbd=v=>v==="TBD"?`<span class="sub">TBD</span>`:null;
-const nmLines=(v,sep)=>v.split(sep).map(t=>`<div style="white-space:nowrap">${nmTbd(t.trim())||esc(t.trim())}</div>`).join("");
+const nmLines=(v,sep)=>`<span class="lines">`+v.split(sep).map(t=>`<div style="white-space:nowrap">${nmTbd(t.trim())||esc(t.trim())}</div>`).join("")+`</span>`;
 const nmRow=x=>{
-  const k=doneKey(x),dn=isDone(x),ek=esc(k);
-  const prob=x.time.includes("(multiple)")||x.days.includes("/");
-  return `<tr class="${dn?"done":""}"><td>${starBtn(k)}<span class="code">${esc(x.code)}</span></td>
-    <td>${esc(x.name)}<div class="sub">${esc(DEPT[x.dept])}</div>${prob?NMWARN:""}</td>
-    <td>${nmTbd(x.prof)||esc(x.prof.replace(/ \/ /g,", "))}</td>
-    <td>${nmTbd(x.days)||esc(x.days.replace(/\//g," / "))}</td>
-    <td>${nmLines(x.time.replace(" (multiple)","")," / ")}</td>
-    <td>${nmTbd(x.loc)||esc(x.loc)}</td>
-    <td><div class="lnks"><button class="lnk" data-done="${ek}">${dn?"Undo class already taken":"Class already taken"}</button><button class="lnk" data-skip="${ek}">Not interested in this class</button></div></td></tr>`;
+  const k=x.key,dn=isDone(x),on=sel.has(x.id);
+  const prob=nmProb(x);
+  const note=x.custom?`<div class="sub">Your time: ${esc(timeStr(x.sch))}${x.sch.cr!=null?" · "+fmtCr(x.sch.cr)+" cr":""}${x.sch.room?" · "+esc(x.sch.room):""}</div>`:(prob?NMWARN:"");
+  return `<tr class="${on?"sel":""} ${CL.has(x.id)?"clash":""} ${dn?"done":""}"><td class="c-head">${starBtn(k)}<span class="code">${esc(x.code)}</span></td>
+    <td class="c-main">${esc(x.name)}<div class="sub">${esc(DEPT[x.dept])}</div>${note}</td>
+    <td data-label="Professor">${nmTbd(x.prof)||esc(x.prof.replace(/ \/ /g,", "))}</td>
+    <td data-label="Days">${nmTbd(x.days)||esc(x.days.replace(/\//g," / "))}</td>
+    <td data-label="Time">${nmLines(x.time.replace(" (multiple)","")," / ")}</td>
+    <td data-label="Location">${nmTbd(x.loc)||esc(x.loc)}</td>
+    <td class="c-act">${dn?doneTag:x.sch?addBtn(x):`<button class="add" data-nmtime="${esc(k)}">Set my time</button>`}${moreBtn(k,lbl(x))}</td></tr>`;
 };
 const nmTable=list=>`<div class="tablewrap"><table>
   <thead><tr><th style="cursor:default">Code</th><th style="cursor:default">Class</th><th style="cursor:default">Professor</th><th style="cursor:default">Days</th><th style="cursor:default">Time</th><th style="cursor:default">Location</th><th style="cursor:default"></th></tr></thead>
@@ -893,18 +1167,12 @@ const nmTable=list=>`<div class="tablewrap"><table>
 
 function nonView(){
   const ql=nQ.trim().toLowerCase();
-  const list=NM.filter(x=>vis(x)&&(!nDept||x.dept===nDept)&&(!nLvl||x.lvl===nLvl)&&
+  const list=NM.filter(x=>vis(x)&&(!nDept||x.dept===nDept)&&(!nLvl||x.lvl===nLvl)&&passCommon(x,{day:1,tod:1})&&
     (!ql||[x.code,x.name,x.prof,DEPT[x.dept]].join(" ").toLowerCase().includes(ql)));
   const total=NM.filter(vis).length;
   const depts=DORD.filter(d=>list.some(x=>x.dept===d));
-  return `<div class="note">Non-MBA classes for Winter 2027 (300 level and up), from BYU Class Search. Each row is one class. When a class has many sections, the source combines their rooms, days and times, so those classes are marked: check BYU MyMap for the exact schedule. These can't be added to your schedule or checked for conflicts. TBD means BYU hasn't listed it yet.</div>
-  <div class="controls">
-    <input type="search" id="nq" placeholder="Search code, name, professor" value="${esc(nQ)}" aria-label="Search non-MBA classes">
-    <select id="ndept" aria-label="Filter by department"><option value="">All departments</option>${DORD.map(d=>`<option value="${d}" ${nDept===d?"selected":""}>${d} – ${esc(DEPT[d])}</option>`).join("")}</select>
-    <select id="nlvl" aria-label="Filter by level"><option value="">All levels</option><option value="400" ${nLvl==="400"?"selected":""}>300/400-level</option><option value="500" ${nLvl==="500"?"selected":""}>500/600-level</option></select>
-    ${done.size?doneCtl():""}
-    <span class="sub">${list.length} of ${total} shown</span>
-  </div>`+(depts.length?depts.map(d=>`<h2 class="daytitle">${d} – ${esc(DEPT[d])}</h2>`+nmTable(list.filter(x=>x.dept===d))).join(""):`<div class="note empty">No classes match those filters.</div>`);
+  return `<div class="note">Non-MBA classes for Winter 2027 (300 level and up), from BYU Class Search. Each row is one class. Classes with a single clear meeting time can be added to your schedule. For classes with many sections, find your section on <a href="https://commtech.byu.edu/auth/mymap/" target="_blank" rel="noopener">BYU MyMap</a>, then use <b>Set my time</b> to enter it yourself. TBD means BYU hasn't listed it yet.</div>
+  ${ctrl("nm",`${list.length} of ${total} shown`)}`+(depts.length?depts.map(d=>`<h2 class="daytitle">${d} – ${esc(DEPT[d])}</h2>`+nmTable(list.filter(x=>x.dept===d))).join(""):`<div class="note empty">No classes match those filters.</div>`);
 }
 
 // ---- All classes tab: MBA + SWELL + Non-MBA in one searchable, sortable table
@@ -915,7 +1183,7 @@ const eText=x=>[eCode(x),x.name,x.prof||"",x.room||x.loc||"",x.dept?DEPT[x.dept]
 const eSort=list=>{
   const key={
     code:x=>eCode(x),name:x=>x.name,prof:x=>x.prof==="TBD"?"":(x.prof||""),type:x=>kindOf(x),
-    time:x=>x.kind==="nonmba"?1e9:dayRank(x)*10000+(x.online?0:x.s)
+    time:x=>x.kind==="nonmba"?(x.sch?dayRank(x.sch)*10000+x.sch.s:1e9):dayRank(x)*10000+(x.online?0:x.s)
   }[eK];
   return [...list].sort((a,b)=>{
     const u=key(a),v=key(b);
@@ -924,8 +1192,9 @@ const eSort=list=>{
   });
 };
 function eRow(x,cl){
-  const kind=kindOf(x),k=doneKey(x),ek=esc(k),dn=isDone(x),addable=kind!=="Non-MBA";
-  const on=addable&&sel.has(x.id);
+  const kind=kindOf(x),k=doneKey(x),dn=isDone(x);
+  const canAdd=kind!=="Non-MBA"||!!x.sch;
+  const on=sel.has(x.id);
   let sub,when,extra="";
   if(kind==="MBA"){
     sub=`${esc(x.room)} · ${x.cr} cr · ${x.seats} seats`;when=esc(timeStr(x));extra=coreTag(x);
@@ -934,34 +1203,29 @@ function eRow(x,cl){
     when=esc(timeStr(x));extra=coreTag(x)+(x.blk?`<span class="tag">${esc(blkTxt(x.blk))}</span>`:"");
   }else{
     sub=`${esc(DEPT[x.dept])} · ${esc(x.loc)}`;
-    when=(x.days==="TBD"?"":`<div>${esc(x.days.replace(/\//g," / "))}</div>`)+nmLines(x.time.replace(" (multiple)","")," / ");
-    extra=nmProb(x)?NMWARN:"";
+    when=`<span class="lines">`+(x.days==="TBD"?"":`<div>${esc(x.days.replace(/\//g," / "))}</div>`)+nmLines(x.time.replace(" (multiple)","")," / ")+`</span>`;
+    extra=x.custom?`<div class="sub">Your time: ${esc(timeStr(x.sch))}</div>`:(nmProb(x)?NMWARN:"");
   }
   const prof=x.kind==="nonmba"?(x.prof==="TBD"?"TBD":x.prof.replace(/ \/ /g,", ")):(x.prof||"Instructor TBA");
-  return `<tr class="${on?"sel":""} ${addable&&cl.has(x.id)?"clash":""} ${dn?"done":""}">
-    <td>${starBtn(k)}<span class="code">${esc(eCode(x))}</span></td>
-    <td>${esc(x.name)}<div class="sub">${sub}</div>${extra}</td>
-    <td>${esc(prof)}</td>
-    <td>${when}</td>
-    <td><span class="tag ${kind==="SWELL"?"ok":""}" style="white-space:nowrap">${kind}</span></td>
-    <td>${dn?`<span class="tag ok">Already taken</span>`:addable?`<button class="add${kind==="SWELL"?" sw":""}" data-add="${x.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`:""}<div class="lnks"><button class="lnk" data-done="${ek}">${dn?"Undo class already taken":"Class already taken"}</button><button class="lnk" data-skip="${ek}">Not interested in this class</button></div></td></tr>`;
+  return `<tr class="${on?"sel":""} ${canAdd&&cl.has(x.id)?"clash":""} ${dn?"done":""}">
+    <td class="c-head">${starBtn(k)}<span class="code">${esc(eCode(x))}</span></td>
+    <td class="c-main">${esc(x.name)}<div class="sub">${sub}</div>${extra}</td>
+    <td data-label="Professor">${esc(prof)}</td>
+    <td data-label="Days & time">${when}</td>
+    <td data-label="Type"><span class="tag ${kind==="SWELL"?"ok":""}" style="white-space:nowrap">${kind}</span></td>
+    <td class="c-act">${dn?doneTag:canAdd?addBtn(x,kind==="SWELL"?"sw":""):`<button class="add" data-nmtime="${esc(k)}">Set my time</button>`}${moreBtn(k,lbl(x))}</td></tr>`;
 }
 function everyView(){
   const cl=clashIds();
   const ql=eQ.trim().toLowerCase();
   const pool=[...C,...S,...NM].filter(vis);
-  const list=eSort(pool.filter(x=>(!eTy||kindOf(x)===eTy)&&(!ql||eText(x).includes(ql))));
+  const list=eSort(pool.filter(x=>(!eTy||kindOf(x)===eTy)&&(!nDept||x.dept===nDept)&&passCommon(x,{day:1,tod:1,cr:1,full:1})&&(!ql||eText(x).includes(ql))));
   const th=(k,l)=>sortTh(k,l,eK===k,eDir,"data-esort");
-  return `<div class="note">Search every class in one place: MBA, SWELL and non-MBA classes. MBA and SWELL classes can be added to your schedule from here. Non-MBA classes can't be added, so check BYU MyMap for their schedules.</div>
-  <div class="controls">
-    <input type="search" id="eq" placeholder="Search any class, professor or room" value="${esc(eQ)}" aria-label="Search all classes">
-    <select id="etype" aria-label="Filter by type"><option value="">All types</option><option value="MBA" ${eTy==="MBA"?"selected":""}>MBA classes</option><option value="SWELL" ${eTy==="SWELL"?"selected":""}>SWELL classes</option><option value="Non-MBA" ${eTy==="Non-MBA"?"selected":""}>Non-MBA classes</option></select>
-    ${done.size?doneCtl():""}
-    <span class="sub">${list.length} of ${pool.length} shown</span>
-  </div>
+  return `<div class="note">Search every class in one place: MBA, SWELL and non-MBA classes. Add MBA and SWELL classes to your schedule from here. For non-MBA classes, use <b>Set my time</b> after checking BYU MyMap.</div>
+  ${ctrl("every",`${list.length} of ${pool.length} shown`)}
   ${SORTHINT}
   <div class="tablewrap"><table>
-    <thead><tr>${th("code","Code")}${th("name","Class")}${th("prof","Professor")}${th("time","Days & time")}${th("type","Type")}<th style="cursor:default"></th></tr></thead>
+    <thead><tr>${th("code","Code")}${th("name","Class")}${th("prof","Professor")}${th("time","Days & time")}${th("type","Type")}<th style="cursor:default"><span class="sr-only">Actions</span></th></tr></thead>
     <tbody>${list.length?list.map(x=>eRow(x,cl)).join(""):`<tr><td colspan="6" class="empty">No classes match that search.</td></tr>`}</tbody>
   </table></div>`;
 }
@@ -969,7 +1233,7 @@ function everyView(){
 function swGroup(k,list){
   const g=[...list].sort((a,b)=>dayRank(a)-dayRank(b)||(a.online?0:a.s)-(b.online?0:b.s)||a.sec.localeCompare(b.sec));
   const o=isOpenAct(k),nAdd=g.filter(x=>sel.has(x.id)).length,key="s:"+k;
-  return `<div class="group sw ${isDone(g[0])?"dn":""}"><h3><span class="acthead">${starBtn(key)}<button class="acthd" data-act="${k}" aria-expanded="${o}">${o?"▾":"▸"} ${esc(TITLES[k])}<span class="sub">SWELL ${k}</span></button></span><span>${nAdd?`${nAdd} added · `:""}${g.length} section${g.length>1?"s":""} · <button class="lnk" data-done="${key}">${isDone(g[0])?"Undo class already taken":"Class already taken"}</button> · <button class="lnk" data-skip="${key}">Not interested in this class</button></span></h3>${o?`<ul>${g.map(swRow).join("")}</ul>`:""}</div>`;
+  return `<div class="group sw ${isDone(g[0])?"dn":""}"><h3><span class="acthead">${starBtn(key)}<button class="acthd" data-act="${k}" aria-expanded="${o}">${o?"▾":"▸"} ${esc(TITLES[k])}<span class="sub">SWELL ${k}</span></button></span><span>${nAdd?`${nAdd} added · `:""}${g.length} section${g.length>1?"s":""} ${moreBtn(key,TITLES[k])}</span></h3>${o?`<ul>${g.map(swRow).join("")}</ul>`:""}</div>`;
 }
 
 function favsView(){
@@ -1009,49 +1273,215 @@ function skipView(){
   <div class="group"><ul>${list.map(i=>`<li><span class="nm"><b>${esc(i.title)}</b>${i.kind==="Non-MBA"?"":`<div class="sub">${i.n} section${i.n===1?"":"s"}</div>`}</span><span class="tag ${i.kind==="SWELL"?"ok":""}">${i.kind}</span><button class="add" data-skip="${esc(i.k)}">Bring back</button></li>`).join("")}</ul></div>`;
 }
 
+// ---- export: print, calendar file, plain text
+const exportBar=()=>`<div class="exportbar" role="group" aria-label="Export your schedule"><b>Take it with you:</b>
+  <button class="btn" data-export="print">Print / Save as PDF</button>
+  <button class="btn" data-export="ics">Add to calendar (.ics)</button>
+  <button class="btn" data-export="copy">Copy as text</button></div>`;
+const TERM={start:[2027,1,6],end:[2027,4,14]},BLKD={"1st":{start:[2027,1,6],end:[2027,2,24]},"2nd":{start:[2027,2,25],end:[2027,4,14]}};
+const p2=n=>String(n).padStart(2,"0");
+const icsEsc=t=>String(t||"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
+function buildICS(items){
+  const stamp=new Date().toISOString().replace(/[-:]/g,"").replace(/\.\d+Z$/,"Z");
+  const dow={M:1,T:2,W:3,R:4,F:5},byday={M:"MO",T:"TU",W:"WE",R:"TH",F:"FR"};
+  const ymd=dt=>dt.getFullYear()+p2(dt.getMonth()+1)+p2(dt.getDate());
+  const hms=m=>p2(Math.floor(m/60))+p2(m%60)+"00";
+  const L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Winter 2027 Schedule Planner//EN","CALSCALE:GREGORIAN","METHOD:PUBLISH","X-WR-CALNAME:Winter 2027 classes"];
+  items.forEach(x=>{
+    const b=x.blk&&BLKD[x.blk]?BLKD[x.blk]:TERM;
+    const st=new Date(b.start[0],b.start[1]-1,b.start[2]);
+    let first=null;
+    [...x.days].forEach(d=>{const t=new Date(st);t.setDate(t.getDate()+((dow[d]-t.getDay()+7)%7));if(!first||t<first)first=t});
+    L.push("BEGIN:VEVENT","UID:"+x.id+"-"+ymd(first)+"@winter2027-planner","DTSTAMP:"+stamp,
+      "DTSTART:"+ymd(first)+"T"+hms(x.s),"DTEND:"+ymd(first)+"T"+hms(x.e),
+      "RRULE:FREQ=WEEKLY;BYDAY="+[...x.days].map(d=>byday[d]).join(",")+";UNTIL="+b.end[0]+p2(b.end[1])+p2(b.end[2])+"T235959",
+      "SUMMARY:"+icsEsc(x.kind==="swell"?x.name+" (SWELL)":lbl(x)));
+    if(x.room)L.push("LOCATION:"+icsEsc(x.room));
+    if(x.prof)L.push("DESCRIPTION:"+icsEsc((x.kind==="swell"?"Instructor: ":"Professor: ")+x.prof));
+    L.push("END:VEVENT");
+  });
+  L.push("END:VCALENDAR");
+  return L.join("\r\n")+"\r\n";
+}
+function downloadText(name,text,type){
+  const b=new Blob([text],{type});const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+}
+function scheduleText(){
+  const items=selItems().sort((a,b)=>dayRank(a)-dayRank(b)||(a.s||0)-(b.s||0)||a.code.localeCompare(b.code));
+  const cr=items.reduce((t,x)=>t+(x.kind==="swell"?0.5:(x.cr||0)),0),pairs=pairsOf(items).length;
+  return "Winter 2027 schedule\n\n"+items.map(x=>"• "+lbl(x)+" — "+timeStr(x)+(x.room?" — "+x.room:"")+(x.prof?" — "+x.prof:"")).join("\n")+
+    "\n\n"+items.length+" class"+(items.length===1?"":"es")+", "+fmtCr(cr)+" credit hours"+(pairs?", "+pairs+" conflict"+(pairs===1?"":"s"):", no conflicts")+"\n";
+}
+function runExport(kind){
+  const items=selItems();
+  if(!items.length){toast("Add a class first, then you can export your schedule.");return}
+  if(kind==="print"){if(tab!=="mine"){tab="mine";render()}setTimeout(()=>window.print(),80)}
+  else if(kind==="ics"){
+    const timed=items.filter(x=>!x.online&&x.days&&x.s!=null),skipped=items.length-timed.length;
+    if(!timed.length){toast("None of your classes have a set meeting time, so there is nothing to put on a calendar.");return}
+    downloadText("winter-2027-schedule.ics",buildICS(timed),"text/calendar");
+    toast("Calendar file downloaded ("+timed.length+" class"+(timed.length===1?"":"es")+"). It repeats weekly from Jan 6 to Apr 14, 2027 and does not skip holidays."+(skipped?" "+skipped+" online class"+(skipped===1?"":"es")+" without set times left out.":""));
+  }else{
+    const txt=scheduleText();
+    const done_=()=>toast("Schedule copied. Paste it into an email or a note.");
+    const fb=()=>{const ta=document.createElement("textarea");ta.value=txt;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand("copy")}catch(e){}ta.remove();ok?done_():toast("Couldn't copy automatically. Try Print / Save as PDF instead.")};
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(done_,fb);else fb();
+  }
+}
+
+// ---- schedule summary bar (always visible)
+function updateSummary(){
+  const el=document.getElementById("sumbar");if(!el)return;
+  const items=selItems(),n=items.length;
+  let h;
+  if(!n)h=`<span class="sumtxt">No classes added yet. Use <b>Add</b> on any class to build your schedule.</span>`;
+  else{
+    const cr=items.reduce((t,x)=>t+(x.kind==="swell"?0.5:(x.cr||0)),0),miss=items.some(x=>x.kind==="nonmba"&&x.cr==null),pairs=pairsOf(items).length;
+    h=`<span class="sumtxt"><b>${n} class${n===1?"":"es"}</b> · ${fmtCr(cr)}${miss?"+":""}<span class="cl"> credit hours</span><span class="cs"> cr</span> · ${pairs?`<span class="sumwarn">${pairs} conflict${pairs===1?"":"s"}</span>`:`<span class="sumok">no conflicts</span>`}</span>`;
+    if(tab!=="mine")h+=`<button class="btn sm" data-tab="mine">View schedule</button>`;
+  }
+  el.innerHTML=h;
+}
+
+// ---- Non-MBA: enter your own meeting time
+const val2m=v=>{const m=/^(\d{1,2}):(\d{2})$/.exec(v||"");return m?(+m[1])*60+(+m[2]):null};
+const m2val=m=>p2(Math.floor(m/60))+":"+p2(m%60);
+function openNmDialog(k){
+  const x=NMKEY[k];if(!x)return;
+  const dlg=document.getElementById("nmdlg");dlg.dataset.key=k;
+  const cur=NMC[k]||(x.auto?x.sch:null);
+  document.getElementById("nmTitle").textContent=(NMC[k]||x.auto?"Change my time: ":"Set my time: ")+lbl(x);
+  document.getElementById("nmHint").innerHTML="Class Search lists: <b>"+esc(x.days.replace(/\//g," / "))+"</b> · <b>"+esc(x.time.replace(" (multiple)",""))+"</b>"+(nmProb(x)?" (several sections). Find your section on MyMap and enter its days and time below.":".");
+  dlg.querySelectorAll("input[name=nmday]").forEach(i=>{i.checked=!!cur&&cur.days.includes(i.value)});
+  document.getElementById("nmStart").value=cur?m2val(cur.s):"";
+  document.getElementById("nmEnd").value=cur?m2val(cur.e):"";
+  document.getElementById("nmCr").value=cur&&cur.cr!=null?cur.cr:"";
+  document.getElementById("nmRoom").value=cur&&cur.room?cur.room:"";
+  document.getElementById("nmErr").textContent="";
+  document.getElementById("nmRemove").hidden=!NMC[k];
+  closeMenu();
+  if(dlg.showModal)dlg.showModal();else dlg.setAttribute("open","");
+  document.querySelector("#nmdlg input[name=nmday]").focus();
+}
+function closeNmDialog(){const dlg=document.getElementById("nmdlg");if(dlg.close)dlg.close();else dlg.removeAttribute("open")}
+function saveNmDialog(){
+  const dlg=document.getElementById("nmdlg"),k=dlg.dataset.key,x=NMKEY[k],err=m=>{document.getElementById("nmErr").textContent=m};
+  const days=[...dlg.querySelectorAll("input[name=nmday]:checked")].map(i=>i.value).join("");
+  const st=val2m(document.getElementById("nmStart").value),en=val2m(document.getElementById("nmEnd").value);
+  const crRaw=document.getElementById("nmCr").value.trim(),crv=crRaw===""?null:Number(crRaw);
+  if(!days)return err("Choose at least one day.");
+  if(st==null||en==null)return err("Enter a start time and an end time.");
+  if(en<=st)return err("The end time has to be after the start time.");
+  if(crv!=null&&!(crv>=0&&crv<=9))return err("Credits should be a number from 0 to 9.");
+  NMC[k]={days,s:st,e:en,cr:crv,room:document.getElementById("nmRoom").value.trim().slice(0,60)};
+  saveNmc();refreshNm(x);
+  if(!isDone(x)&&!isSkip(x))sel.add(x.id);
+  save();closeNmDialog();render();announce(lbl(x)+" added to your schedule with your time.");
+}
+function removeNmTime(){
+  const dlg=document.getElementById("nmdlg"),k=dlg.dataset.key,x=NMKEY[k];
+  delete NMC[k];saveNmc();refreshNm(x);if(!x.sch)sel.delete(x.id);
+  save();closeNmDialog();render();
+}
+
+// ---- backup / restore
+const BK=["mba-sel","swell-sel","nm-sel","done-keys","fav-keys","skip-keys","nm-custom"];
+function backupPicks(){
+  const o={app:"winter-2027-planner",version:1,saved:new Date().toISOString(),data:{}};
+  BK.forEach(k=>{try{const v=localStorage.getItem(k);if(v!==null)o.data[k]=JSON.parse(v)}catch(e){}});
+  downloadText("my-winter-2027-picks.json",JSON.stringify(o,null,2),"application/json");
+  toast("Backup downloaded. Keep the file somewhere safe; you can restore it here later.");
+}
+function restorePicks(file){
+  const r=new FileReader();
+  r.onload=()=>{
+    let o;try{o=JSON.parse(r.result)}catch(e){o=null}
+    if(!o||o.app!=="winter-2027-planner"||!o.data||typeof o.data!=="object"){toast("That file isn't a backup from this planner.");return}
+    if(typeof confirm==="function"&&!confirm("Replace your current picks (schedule, favorites, hidden and already-taken classes) with this backup?"))return;
+    BK.forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});
+    BK.forEach(k=>{if(k in o.data){const v=o.data[k],ok=k==="nm-custom"?(v&&typeof v==="object"&&!Array.isArray(v)):Array.isArray(v);if(ok){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}}});
+    location.reload();
+  };
+  r.readAsText(file);
+}
+
+function focusSig(){
+  const a=document.activeElement;
+  if(!a||a===document.body||!a.dataset||!document.getElementById("view").contains(a))return null;
+  if(a.id)return "#"+a.id;
+  const ks=Object.keys(a.dataset);if(!ks.length)return null;
+  const k=ks[0],kebab=k.replace(/[A-Z]/g,m=>"-"+m.toLowerCase());
+  return `#view ${a.tagName.toLowerCase()}[data-${kebab}="${String(a.dataset[k]).replace(/["\\]/g,"\\$&")}"]`;
+}
 function render(keepFocus){
+  closeMenu();
+  const sig=keepFocus?null:focusSig();
+  CL=clashIds();
   document.getElementById("cnt").textContent=sel.size;
-  document.getElementById("cntsw").textContent=[...sel].filter(i=>i>=1000).length;
+  document.getElementById("cntsw").textContent=[...sel].filter(i=>i>=1000&&i<2000).length;
   document.getElementById("cntfav").textContent=favs.size;
   document.getElementById("cntskip").textContent=skips.size;
-  document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.tab===tab));
+  document.querySelectorAll(".tab").forEach(t=>{const on=t.dataset.tab===tab;t.setAttribute("aria-selected",on);t.tabIndex=on?0:-1});
   const v=document.getElementById("view");
-  v.innerHTML=tab==="all"?allView():tab==="slots"?slotsView():tab==="fill"?fillView():tab==="favs"?favsView():tab==="skip"?skipView():tab==="nonmba"?nonView():tab==="every"?everyView():mineView();
+  v.setAttribute("aria-labelledby","tab-"+tab);
+  v.innerHTML=tab==="all"?allView():tab==="fill"?fillView():tab==="favs"?favsView():tab==="skip"?skipView():tab==="nonmba"?nonView():tab==="every"?everyView():mineView();
+  updateSummary();
   if(keepFocus){const el=document.getElementById(tab==="fill"?"swq":tab==="nonmba"?"nq":tab==="every"?"eq":"q");const len=tab==="fill"?swQ.length:tab==="nonmba"?nQ.length:tab==="every"?eQ.length:q.length;if(el){el.focus();el.setSelectionRange(len,len)}}
+  else if(sig){const el=document.querySelector(sig);if(el)el.focus({preventScroll:true})}
 }
 
 const keepY=fn=>{const y=window.scrollY;fn();render();window.scrollTo(0,y)};
+function scrollToView(){
+  const st=document.getElementById("sticky"),v=document.getElementById("view");
+  const y=v.getBoundingClientRect().top+window.scrollY-st.offsetHeight-8;
+  if(window.scrollY>y)window.scrollTo(0,Math.max(0,y));
+}
 document.addEventListener("click",e=>{
-  const t=e.target.closest("[data-tab],[data-add],[data-sort],[data-esort],[data-ov],[data-focus],[data-clearfocus],[data-clearall],[data-clearsw],[data-gap],[data-act],[data-swreset],[data-done],[data-cleardone],[data-fav],[data-skip],[data-clearskip]");
+  const T=e.target;
+  if(menuBtn&&!T.closest("#popmenu")&&!T.closest("[data-menu]"))closeMenu();
+  const t=T.closest("[data-tab],[data-add],[data-sort],[data-esort],[data-ov],[data-focus],[data-clearfocus],[data-clearall],[data-clearsw],[data-gap],[data-act],[data-swreset],[data-done],[data-cleardone],[data-fav],[data-skip],[data-clearskip],[data-menu],[data-mode],[data-clearf],[data-nmtime],[data-export],[data-toastundo],[data-toastclose],[data-backup],[data-restore]");
   if(!t)return;
-  if(t.dataset.tab){tab=t.dataset.tab;render();window.scrollTo(0,0)}
-  else if(t.dataset.add!==undefined){const i=+t.dataset.add;keepY(()=>{sel.has(i)?sel.delete(i):sel.add(i);save()})}
-  else if(t.dataset.esort){const k=t.dataset.esort;if(eK===k)eDir*=-1;else{eK=k;eDir=1}render()}
-  else if(t.dataset.sort){const k=t.dataset.sort;if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=1}render()}
-  else if(t.dataset.ov){const i=+t.dataset.ov;keepY(()=>{open.has(i)?open.delete(i):open.add(i)})}
-  else if(t.dataset.focus){focusId=+t.dataset.focus;open.clear();render();window.scrollTo(0,0)}
-  else if(t.dataset.clearfocus){focusId=null;render()}
-  else if(t.dataset.clearall){sel.clear();save();render()}
-  else if(t.dataset.clearsw){[...sel].filter(i=>i>=1000).forEach(i=>sel.delete(i));save();render()}
-  else if(t.dataset.gap){const [d,s,en]=t.dataset.gap.split("|");
-    if(swDay===d&&swAfter===+s&&swBefore===+en){swDay="";swAfter="";swBefore=""}else{swDay=d;swAfter=+s;swBefore=+en}render()}
-  else if(t.dataset.act){const k=t.dataset.act;keepY(()=>{actState[k]=!isOpenAct(k)})}
-  else if(t.dataset.done){const k=t.dataset.done;keepY(()=>{if(done.has(k))done.delete(k);else{done.add(k);[...sel].forEach(i=>{if(doneKey(A(i))===k)sel.delete(i)})}saveDone();save()})}
-  else if(t.dataset.cleardone){done.clear();saveDone();render()}
-  else if(t.dataset.fav){const k=t.dataset.fav;keepY(()=>{if(favs.has(k))favs.delete(k);else{favs.add(k);skips.delete(k)}saveFav();saveSkip()})}
-  else if(t.dataset.skip){const k=t.dataset.skip;keepY(()=>{if(skips.has(k))skips.delete(k);else{skips.add(k);favs.delete(k);[...sel].forEach(i=>{if(doneKey(A(i))===k)sel.delete(i)})}saveFav();saveSkip();save()})}
-  else if(t.dataset.clearskip){skips.clear();saveSkip();render()}
-  else if(t.dataset.swreset){swQ="";swDay="";swAfter="";swBefore="";swBlock="";swOnline=true;swShowConf=false;render()}
+  const d=t.dataset;
+  if(d.menu!==undefined){if(menuBtn===t)closeMenu(true);else{closeMenu();openMenuFor(t)}}
+  else if(d.tab){tab=d.tab;render();scrollToView()}
+  else if(d.add!==undefined){const i=+d.add;keepY(()=>{sel.has(i)?sel.delete(i):sel.add(i);save()})}
+  else if(d.esort){const k=d.esort;if(eK===k)eDir*=-1;else{eK=k;eDir=1}render()}
+  else if(d.sort){const k=d.sort;if(sortK===k)sortDir*=-1;else{sortK=k;sortDir=1}render()}
+  else if(d.mode){mbaMode=d.mode;render()}
+  else if(d.ov){const i=+d.ov;keepY(()=>{open.has(i)?open.delete(i):open.add(i)})}
+  else if(d.focus){focusId=+d.focus;open.clear();render();window.scrollTo(0,0)}
+  else if(d.clearfocus){focusId=null;render()}
+  else if(d.clearall){sel.clear();save();render()}
+  else if(d.clearsw){[...sel].filter(i=>i>=1000&&i<2000).forEach(i=>sel.delete(i));save();render()}
+  else if(d.gap){const [dd,s0,en]=d.gap.split("|");
+    if(swDay===dd&&swAfter===+s0&&swBefore===+en){swDay="";swAfter="";swBefore=""}else{swDay=dd;swAfter=+s0;swBefore=+en}render()}
+  else if(d.act){const k=d.act;keepY(()=>{actState[k]=!isOpenAct(k)})}
+  else if(d.done){const k=d.done;keepY(()=>toggleDone(k))}
+  else if(d.cleardone){done.clear();saveDone();render()}
+  else if(d.fav){const k=d.fav;keepY(()=>{if(favs.has(k))favs.delete(k);else{favs.add(k);skips.delete(k)}saveFav();saveSkip()})}
+  else if(d.skip){const k=d.skip;keepY(()=>toggleSkip(k))}
+  else if(d.clearskip){skips.clear();saveSkip();render()}
+  else if(d.swreset){swQ="";swDay="";swAfter="";swBefore="";swBlock="";swOnline=true;swShowConf=false;render()}
+  else if(d.clearf){q=nQ=eQ=swQ="";dayF=todF=crF=nDept=nLvl=eTy="";hideFull=false;render()}
+  else if(d.nmtime){openNmDialog(d.nmtime)}
+  else if(d.export){runExport(d.export)}
+  else if(d.toastundo!==undefined){if(toastUndo){const u=toastUndo;hideToast();u();render()}}
+  else if(d.toastclose!==undefined){hideToast()}
+  else if(d.backup!==undefined){backupPicks()}
+  else if(d.restore!==undefined){document.getElementById("restorefile").click()}
 });
 document.addEventListener("input",e=>{
-  if(e.target.id==="q"){q=e.target.value;focusId=null;render(true)}
-  if(e.target.id==="swq"){swQ=e.target.value;render(true)}
-  if(e.target.id==="nq"){nQ=e.target.value;render(true)}
-  if(e.target.id==="eq"){eQ=e.target.value;render(true)}
+  const id=e.target.id;
+  if(id==="q"||id==="nq"||id==="eq"||id==="swq"){q=nQ=eQ=swQ=e.target.value;if(id==="q")focusId=null;render(true)}
 });
 document.addEventListener("change",e=>{
   const id=e.target.id,v=e.target.value;
   if(id==="day"){dayF=v;focusId=null;render()}
+  if(id==="tod"){todF=v;render()}
+  if(id==="crsel"){crF=v;render()}
+  if(id==="msort"){if(tab==="every"){eK=v;eDir=1}else{sortK=v;sortDir=1}render()}
   if(id==="full"){hideFull=e.target.checked;render()}
   if(id==="ndept"){nDept=v;render()}
   if(id==="etype"){eTy=v;render()}
@@ -1063,7 +1493,34 @@ document.addEventListener("change",e=>{
   if(id==="swonline"){swOnline=e.target.checked;render()}
   if(id==="swconf"){swShowConf=e.target.checked;render()}
   if(id==="showdone"){showDone=e.target.checked;render()}
+  if(id==="restorefile"&&e.target.files&&e.target.files[0]){restorePicks(e.target.files[0]);e.target.value=""}
 });
+document.addEventListener("keydown",e=>{
+  const m=document.getElementById("popmenu");
+  if(e.key==="Escape"){
+    if(menuBtn){closeMenu(true);e.preventDefault();return}
+    const tt=document.getElementById("toast");if(tt&&!tt.hidden)hideToast();
+  }
+  if(!m.hidden){
+    const items=[...m.querySelectorAll("button")],i=items.indexOf(document.activeElement);
+    if(e.key==="ArrowDown"){items[(i+1)%items.length].focus();e.preventDefault()}
+    else if(e.key==="ArrowUp"){items[(i-1+items.length)%items.length].focus();e.preventDefault()}
+    else if(e.key==="Tab")closeMenu();
+  }
+  const tb=e.target.closest&&e.target.closest("[role=tab]");
+  if(tb&&["ArrowLeft","ArrowRight","Home","End"].includes(e.key)){
+    const tabs=[...document.querySelectorAll("[role=tab]")];let i=tabs.indexOf(tb);
+    i=e.key==="Home"?0:e.key==="End"?tabs.length-1:(i+(e.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length;
+    tabs[i].focus();tab=tabs[i].dataset.tab;render();e.preventDefault();
+  }
+});
+window.addEventListener("scroll",()=>{if(menuBtn)closeMenu()},{passive:true});
+window.addEventListener("resize",()=>{if(menuBtn)closeMenu()});
+document.getElementById("nmform").addEventListener("submit",e=>{e.preventDefault();saveNmDialog()});
+document.getElementById("nmCancel").addEventListener("click",closeNmDialog);
+document.getElementById("nmRemove").addEventListener("click",removeNmTime);
+// "How this works" is open the first time, then stays collapsed
+try{if(!localStorage.getItem("seen-howto")){document.getElementById("howto").open=true;localStorage.setItem("seen-howto","1")}}catch(e){document.getElementById("howto").open=true}
 render();
 </script>
 </body>
