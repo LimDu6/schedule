@@ -118,6 +118,8 @@ tr.done td{opacity:.55}
 .star{border:0;background:none;cursor:pointer;font-size:18px;line-height:1;padding:2px 6px 2px 0;color:var(--muted);vertical-align:middle}
 .star[aria-pressed="true"]{color:var(--star)}
 .star:hover{color:var(--star)}
+.nmwarn{margin-top:4px;font-style:italic}
+.nmwarn a{color:var(--accent);font-weight:600}
 .lnks{display:flex;gap:0 12px;flex-wrap:wrap}
 .tab[data-tab="favs"][aria-selected="true"]{border-bottom-color:var(--star)}
 .badge.fv{background:var(--hl);color:var(--star)}
@@ -132,7 +134,7 @@ tr.done td{opacity:.55}
   <p>Pick your MBA classes first. Then open <b>SWELL classes</b> to see only the SWELL activities that fit around them.</p>
   <p style="margin-top:6px">Sections tagged <span class="tag warn" style="margin:0">Conflicts with 1st year core classes</span> overlap the 1st year core schedule (Tue/Thu 8:00–9:15, 9:30–10:45 and 12:30–1:45).</p>
   <p style="margin-top:6px">Already taken a class? Click <b>Mark completed</b> on it. It then disappears from the lists and from the overlap warnings.</p>
-  <p style="margin-top:6px">Tap <b>☆</b> to save a class to your <b>Favorites</b> tab. Click <b>Not for me</b> on a class you don't want to see: it's hidden everywhere and parked on the <b>Not for me</b> tab, where you can bring it back any time.</p>
+  <p style="margin-top:6px">Tap <b>☆</b> to save a class to your <b>Favorites</b> tab. Click <b>Not interested in this class</b> on a class you don't want to see: it's hidden everywhere and parked on the <b>Not for me</b> tab, where you can bring it back any time.</p>
 </header>
 <div class="wrap">
   <div class="tabs" role="tablist">
@@ -141,6 +143,7 @@ tr.done td{opacity:.55}
     <button class="tab" role="tab" data-tab="favs" aria-selected="false">Favorites<span class="badge fv" id="cntfav">0</span></button>
     <button class="tab" role="tab" data-tab="mine" aria-selected="false">My schedule<span class="badge" id="cnt">0</span></button>
     <button class="tab" role="tab" data-tab="fill" aria-selected="false">SWELL classes<span class="badge sw" id="cntsw">0</span></button>
+    <button class="tab" role="tab" data-tab="nonmba" aria-selected="false">Non MBA classes that count towards graduation</button>
     <button class="tab" role="tab" data-tab="skip" aria-selected="false">Not for me<span class="badge sk" id="cntskip">0</span></button>
   </div>
   <div id="view"></div>
@@ -404,7 +407,7 @@ const overlap=(a,b)=>a.id!==b.id&&!a.online&&!b.online&&[...a.days].some(d=>b.da
 C.forEach(c=>c.over=C.filter(o=>overlap(c,o)));
 C.forEach(c=>c.alts=C.filter(o=>o.id!==c.id&&o.code.split("-")[0]===c.code.split("-")[0]&&o.name===c.name));
 
-const doneKey=x=>x.kind==="swell"?"s:"+x.num:"m:"+x.code.split("-")[0]+"|"+x.name;
+const doneKey=x=>x.kind==="nonmba"?"n:"+x.code+"|"+x.name:x.kind==="swell"?"s:"+x.num:"m:"+x.code.split("-")[0]+"|"+x.name;
 let done=new Set();
 try{const v=JSON.parse(localStorage.getItem("done-keys")||"[]");if(Array.isArray(v))v.forEach(k=>done.add(k))}catch(e){}
 const saveDone=()=>{try{localStorage.setItem("done-keys",JSON.stringify([...done]))}catch(e){}};
@@ -430,6 +433,7 @@ const save=()=>{
   try{localStorage.setItem("swell-sel",JSON.stringify([...sel].filter(i=>i>=1000).map(i=>A(i).key)))}catch(e){}
 };
 
+let nQ="",nDept="",nLvl="";
 let tab="all",q="",dayF="",sortK="time",sortDir=1,hideFull=false,focusId=null,open=new Set();
 // SWELL tab state
 let showDone=false;
@@ -477,7 +481,7 @@ function rowHTML(c,cl){
     <td>${esc(c.prof)}</td>
     <td class="time">${esc(timeStr(c))}</td>
     <td>${dn?`<span class="none">–</span>`:ov?`<button class="ovl" data-ov="${c.id}" aria-expanded="${open.has(c.id)}">${ov} overlap${ov>1?"s":""} ${open.has(c.id)?"▴":"▾"}</button>`:`<span class="none">none</span>`}</td>
-    <td>${dn?`<span class="tag ok">Completed</span>`:`<button class="add" data-add="${c.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}<div class="lnks"><button class="lnk" data-done="${dk}">${dn?"Undo completed":"Mark completed"}</button><button class="lnk" data-skip="${dk}">Not for me</button></div></td></tr>`+(open.has(c.id)&&!dn?detailHTML(c):"");
+    <td>${dn?`<span class="tag ok">Completed</span>`:`<button class="add" data-add="${c.id}" aria-pressed="${on}">${on?"Added":"Add"}</button>`}<div class="lnks"><button class="lnk" data-done="${dk}">${dn?"Undo completed":"Mark completed"}</button><button class="lnk" data-skip="${dk}">Not interested in this class</button></div></td></tr>`+(open.has(c.id)&&!dn?detailHTML(c):"");
 }
 
 function detailHTML(c){
@@ -547,7 +551,7 @@ function slotsView(){
     if(c0.days!==lastDay){lastDay=c0.days;html+=`<h2 class="daytitle">${pat(c0)}</h2>`}
     html+=`<div class="group"><h3>${fmt(c0.s)}–${fmt(c0.e)}<span>${g.length} section${g.length>1?"s":""}</span></h3><ul>`+
       g.map(c=>`<li>${starBtn(doneKey(c))}<span class="code" style="min-width:92px">${esc(c.code)}</span><span class="nm">${esc(c.name)}<div class="sub">${esc(c.prof)} · ${esc(c.room)}</div>${coreTag(c)}</span>
-      <button class="add" data-add="${c.id}" aria-pressed="${sel.has(c.id)}">${sel.has(c.id)?"Added":"Add"}</button></li>`).join("")+`</ul></div>`;
+      <button class="add" data-add="${c.id}" aria-pressed="${sel.has(c.id)}">${sel.has(c.id)?"Added":"Add"}</button><button class="lnk" data-skip="${esc(doneKey(c))}">Not interested in this class</button></li>`).join("")+`</ul></div>`;
   });
   return html;
 }
@@ -704,19 +708,205 @@ function fillView(){
 }
 
 
+// ---- Non-MBA classes that count toward graduation (Winter 2027)
+// Source: BYU Class Search (commtech.byu.edu), Winter 2027, classes 300 and above. One row per class:
+// when a class has several sections, their rooms, days and times are combined in the source.
+const DEPT={ENT:"Entrepreneurial Management",EXDM:"Experience Design & Management",FIN:"Finance",GCI:"Global & Community Impact",GSCM:"Global Supply Chain Management",HRM:"Human Resource Management",IS:"Information Systems",MKTG:"Marketing",MSB:"Marriott School of Business",MPA:"Public Management",STRAT:"Strategic Management"};
+const NM_RAW=`ENT|ENT 300|Starting a Business|Ben Osguthorpe|TNRB 2270|W|2:00–3:50 PM
+ENT|ENT 302|Legal Issues in Entrep|Kimberly Scoville|TNRB 2270 / 2051|TTh|8:00–9:15 AM / 9:30–10:45 AM
+ENT|ENT 323|Entrep Sales & Persuasion|Jason Christensen|TNRB 1106|MW|11:00 AM–12:15 PM
+ENT|ENT 352|Entrep Through Acquisition|Reid Tileston|TNRB 2439|M|4:00–6:50 PM
+ENT|ENT 381|Entrep Lecture Series|Paul Liljenquist|TNRB 1051|W|3:30–4:45 PM
+ENT|ENT 382|Tech Entrep Lecture Series|Jeff Brown|TNRB 2051|T|2:00–3:15 PM
+ENT|ENT 402|Entrepreneurship Analytics|Nile Hatch / Kyle Poulin|TNRB 1439 / 2156|MW|8:00–9:15 AM / 2:00–3:15 PM
+ENT|ENT 411|Creating New Ventures|Chad Carlos|BRMB 270 / TNRB 1315|MW|12:30–1:45 PM / 9:30–10:45 AM
+ENT|ENT 427|Building Your Lean Venture|Scott Evanson|TNRB 2325|TTh|3:30–4:45 PM
+ENT|ENT 431|Innovation Practicum|Anderson / Hatch / Howell / Mattson|TNRB 2325|Th/T|4:00–5:15 PM
+ENT|ENT 434R|New Venture LaunchPad|TBD|TBD|TBD|TBD
+ENT|ENT 436|Experiential Entrepreneurship|Scott Evanson|TNRB 1315|TTh|8:00–9:15 AM
+ENT|ENT 478|Venture Studio Practicum|Nile Hatch|TNRB 2325|TTh|9:30–10:45 AM
+ENT|ENT 490R|Topics in Entrepreneurship|TBD|TBD|TBD|TBD
+EXDM|EXDM 300|Creating a Good Life|Brian Hill / TBD|TNRB 1051|T/M/W|12:30–1:45 PM / 3:30–4:45 PM / 11:00–11:50 AM
+EXDM|EXDM 302|Hospitality Management|Nathan Stokes|TNRB 2439|W|4:00–5:50 PM
+EXDM|EXDM 303|Intro to Sports Management|Anna Metcalf|TNRB 2156|Th|5:00–7:50 PM
+EXDM|EXDM 415|Experience-Centric Management|Ross Storey / C. Hodge / Jim Anderson|TNRB 1258 / 2124 / 1244|MW/TTh|9:30 AM–4:45 PM (multiple)
+EXDM|EXDM 416|Experiential Marketing|Peter Ward / Jim Anderson|TNRB 1258 / 1439 / 1321|MW/TTh|8:00 AM–3:15 PM (multiple)
+EXDM|EXDM 418|Designing for Inclusion & Belonging|Ramon Zabriskie / TBD|SFH 191 / RB 227|MW|9:30 AM–1:45 PM (multiple)
+EXDM|EXDM 432|Emotional Intelligence|TBD|TBD|TBD|TBD
+EXDM|EXDM 494R|Experience Design Lab|TBD|TBD|TBD|TBD
+EXDM|EXDM 496R|Senior Internship|TBD|TBD|TBD|TBD
+FIN|FIN 315R|Brigham Capital|Ian Wright|TNRB 1124|MW|5:00–6:15 PM
+FIN|FIN 401|Adv Financial Management|Matthew Schaelling|TNRB 1321 / 1272 / 2325|MW|9:30 AM–3:15 PM (multiple)
+FIN|FIN 402|Managerial Finance|Jenn Larson|TNRB 2140 / 2106|MW|12:30–4:45 PM (multiple)
+FIN|FIN 409|Modeling and Valuation|Colby Wright|TNRB 2106|MW|12:30–1:45 PM
+FIN|FIN 410|Investments|Ryan Pratt / Thomas Brown|TNRB 1315 / 1439 / 2319 / 1140 / 2124|TTh/MW|9:30 AM–3:15 PM (multiple)
+FIN|FIN 415R|Silver Fund|Ian Wright / Bates / Boyer|TNRB 1124 / 1140 / 1230|MW|3:30–4:45 PM
+FIN|FIN 416|Real Estate Capital Mkts & Inv|Troy Carpenter|TNRB 1439|MW|3:30–4:45 PM
+FIN|FIN 418|Financial Planning|TBD|TNRB 2439|TTh|8:00–9:15 AM
+FIN|FIN 425|PE and VC|TBD|TBD|TBD|TBD
+FIN|FIN 432|International Finance|Andy Naranjo|TNRB 2124|TTh|11:00 AM–12:15 PM
+FIN|FIN 440|Financial Statement Analysis|TBD|TBD|TBD|TBD
+FIN|FIN 453|Money, Banking, & Business|Steven Lund|TNRB 2325|TTh|12:30–1:45 PM
+FIN|FIN 490R|Topics in Finance|TBD|TBD|TBD|TBD
+FIN|FIN 510|CFA Preparation|TBD|TBD|TBD|TBD
+FIN|FIN 585R|Pre-PhD Finance Seminar|TBD|TBD|TBD|TBD
+GCI|GCI 300|Social Impact|Fox / Gibbs / Miller / Heist|TNRB 2220 / 3319 / 2140 / 1106|TTh/MW|2:00–4:45 PM (multiple)
+GCI|GCI 310|Designing Social Impact|Jill Piacitelli|TNRB 2156|MW|11:00 AM–12:15 PM
+GCI|GCI 320|Implementing Social Impact|Eva Witesman|TNRB 2240|TTh|8:00–9:15 AM
+GCI|GCI 381R|Social Impact Lectures|Steven Fox|TNRB 2270|W|4:00–5:15 PM
+GCI|GCI 425R|Social Impact Projects|TBD|TNRB 2270 / 1315 / 2106|TTh|3:30–4:45 PM
+GCI|GCI 430R|Ballard Brief|Rachel Terry|TNRB 2230|MW|3:30–4:45 PM
+GCI|GCI 435R|GoodMeasure|Camille Roundy|TNRB 1216|TTh|2:00–3:15 PM
+GCI|GCI 447|Impact Investing|Ian Davis|TNRB 2240|TTh|3:30–4:45 PM
+GCI|GCI 491R|Topics in Social Impact|Rellaford / J. Thompson|SFH 191|MW/TTh|2:00–2:50 PM / 1:00–1:50 PM
+GSCM|GSCM 410|AI in Business Operations|Scott Sampson|TNRB 2156 / JKB 3113|F/TTh|9:30 AM–12:15 PM / 2:00–3:15 PM
+GSCM|GSCM 411|Global Business Negotiations|Simon Greathead|TNRB 2156|TTh|8:00 AM–3:15 PM (multiple)
+GSCM|GSCM 412|Operations Analytics|Brett Hathaway|TNRB 2439|MW|8:00 AM–1:45 PM (multiple)
+GSCM|GSCM 414|Sustainable Product Life Cycle|Barry Brewer|JKB 3109|MW|8:00 AM–12:15 PM (multiple)
+GSCM|GSCM 419|Customer Relationship Mgmt|Sampson / Webb|JKB 3113|TTh|9:30 AM–1:45 PM (multiple)
+HRM|HRM 300|Organizational Behavior|Tracy Maylett / Isaac Smith|TNRB 2256|MW|8:00–10:45 AM (multiple)
+HRM|HRM 391|Organizational Effectiveness|TBD / Jane Day / Peter Tennis|TNRB 2401 / 2051 / 2256|TTh/MW|8:00 AM–4:45 PM (multiple)
+HRM|HRM 402|Human Resource Management|Cody Reeves|TNRB 2439 / 2140|TTh/MW|8:00–9:15 AM / 11:00 AM–12:15 PM
+HRM|HRM 411|Organiztnl Developmnt & Change|Peter Madsen|TNRB 2124|TTh/T|12:30–1:45 PM / 3:30–4:45 PM
+HRM|HRM 412|Compnstn, Benefits & Perf Mgt|Troy Nielson|TNRB 2439|TTh|9:30–10:45 AM
+HRM|HRM 490R|Topics in HRM|Cody Reeves|TNRB 2230|TTh|9:30–10:45 AM
+HRM|HRM 585R|Pre-PhD Seminar|Peter Madsen|TNRB 1439|Th|3:30–6:15 PM
+IS|IS 302|Intro Databases (Non-Majors)|Nathan Twyman|TNRB 3405|MW|11:00 AM–12:15 PM
+IS|IS 303|Intro Computer Programming|Jacob Steffen / Greg Anderson|TNRB 2220|MW/TTh|12:30–4:45 PM (multiple)
+IS|IS 315|Intro to Python Data Analytics|James Gaskin|TNRB 2140|MW|9:30–10:45 AM
+IS|IS 355|Predictive AI|TBD|TNRB 1124|TTh|3:30–4:45 PM
+IS|IS 365|AI in Business|Tom Meservy|TNRB 2401|TTh|3:30–4:45 PM
+IS|IS 413|Enterprise Application Devel|Spencer Hilton|TNRB 3319 / 3325|MW|9:30 AM–1:45 PM (multiple)
+IS|IS 414|IS Security & Controls|Taylor Wells|TNRB 3319 / 3325|MW|8:00 AM–3:15 PM (multiple)
+IS|IS 455|Predictive AI|Tanner Skousen|TNRB 3319 / 3325|TTh|8:00 AM–3:15 PM (multiple)
+IS|IS 456|Agentic AI in Business|Ryan Schuetzler|TNRB 3319 / 3325|TTh|8:00 AM–3:15 PM (multiple)
+IS|IS 490R|Mentored Research|Gaskin / Davies / Giboney / Schuetzler / Anderson|TBD|TBD|TBD
+IS|IS 501|Business Information Systems|Laura Cutler|TNRB 1051|MW|11:00 AM–12:15 PM
+IS|IS 505|Intro to Python Data Analytics|James Gaskin|TNRB 2140|MW|9:30–10:45 AM
+IS|IS 515|Adv Spreadsheets Bus Analysis|Bonnie Anderson|TNRB 2220|MW|9:30–10:45 AM
+IS|IS 520|Spreadsheet Automation|Clay Posey|TNRB 2270 / 3319|MW|11:00 AM–1:45 PM (multiple)
+IS|IS 532|Cloud & DevOps|Degan Kettles|TBD|TBD|TBD
+IS|IS 537|Data Structures|Spencer Hilton|TNRB 2220|MW|2:00–3:15 PM
+IS|IS 542|Web Development|Steve Liddle|TNRB 2401|MW|8:00–9:15 AM
+IS|IS 552|MISM Capstone Project|Degan Kettles / Scott Evanson|TNRB 2051 / 2325|TTh|8:00–9:15 AM / 3:30–4:45 PM
+IS|IS 555|Data Science for Organizations|Mark Keith|TNRB 2256|TTh|9:30–10:45 AM
+IS|IS 556|Data Engineering|Dave Wilson|TNRB 1272 / 1258|TTh|12:30–4:45 PM (multiple)
+IS|IS 562|IS Product Management|Kevin Ball|TNRB 1216|TTh|12:30–1:45 PM
+IS|IS 567|Cybersecurity & Pen Testing|Justin Giboney|TNRB 3405|MW|2:00–3:15 PM
+IS|IS 571|Academic Research in IS|James Gaskin|JKB 3126|M|2:00–4:50 PM
+IS|IS 582|Tech Strategy and Leadership|Andrew Brown|TNRB 1258|MW|11:00 AM–12:15 PM
+IS|IS 590R|Seminar in Information Systems|Ford / Johnson / Jenkins / TBD|TNRB 2220 / 2325 / 2240|MW|12:30–6:45 PM (multiple)
+IS|IS 599R|Academic Internship|TBD|TBD|TBD|TBD
+IS|IS 693R|Readings & Conference|TBD|TBD|TBD|TBD
+MKTG|MKTG 411|Marketing Analytics|Morgan Bale|TNRB 1321|TTh|12:30–1:45 PM
+MKTG|MKTG 412|Professional Selling|BJ Allen|TNRB 1230|MW|9:30 AM–12:15 PM (multiple)
+MKTG|MKTG 415|Digital Marketing|Bruce Rowe / Morgan Bale|JKB 3113 / TNRB 2325|MW|9:30–12:15 PM (multiple)
+MKTG|MKTG 416|International Marketing|Lee Daniels|TNRB 1272|MW|11:00 AM–12:15 PM
+MKTG|MKTG 418|Pricing Strategies|John Howell|TNRB 2106|MW|9:30–10:45 AM
+MKTG|MKTG 419|Product Marketing|John Howell|TNRB 2401|MW|3:30–4:45 PM
+MKTG|MKTG 420|Marketing Automation|Jeff Larson|TNRB 1230|TTh|9:30–10:45 AM
+MKTG|MKTG 422|Business to Business Selling|Greg Zippi|TNRB 2240|MW|9:30–10:45 AM
+MKTG|MKTG 425|Advanced Digital Marketing|Bruce Rowe|TNRB 1321|MW|8:00–9:15 AM
+MKTG|MKTG 429|Marketing Strategy|Mike Bond|TNRB 1315 / 2325 / 1439 / 1321|MW|8:00 AM–3:15 PM (multiple)
+MKTG|MKTG 490R|Topics in Marketing|Matt Malone / TBD|TBD|TBD|TBD
+MKTG|MKTG 585R|Pre-PhD Marketing Seminar|TBD|TBD|TBD|TBD
+MSB|MSB 300|Ldrshp & the Gospel of Christ|Mark Hansen / TBD|TNRB 2439|MW/W|2:00–2:50 PM / 8:00–9:15 AM
+MSB|MSB 315|Negotiation|Stan Christensen|TNRB 3325|M|3:30–5:20 PM
+MSB|MSB 325|Intro Business Analytics|R. Gardner / Jeff Larson|TNRB 2256|W|12:30–1:45 PM
+MSB|MSB 326|Career Development|Steven Steele|JKB 1104|Th|11:00 AM–12:15 PM
+MSB|MSB 330R|GlobalHub|Ryan Reynolds / Lisa Thomas|TBD|F|10:00 AM–12:50 PM
+MSB|MSB 342|Product Lecture Series|Scott Murff|TNRB 2124|Th|3:30–4:45 PM
+MSB|MSB 380|Executive Lectures|Troy Nielson|TNRB 2051|F|10:00–11:50 AM (multiple)
+MSB|MSB 430|Intro International Business|Shad Morris / James Oldroyd|TNRB 2124|M/Th|11:00 AM–12:15 PM
+MSB|MSB 432|Business and Culture|Simon Greathead|JKB 3134|TTh|12:30–1:45 PM
+MSB|MSB 490R|Topics in Business Management|Webb / Piacitelli / M. Keith / TBD|TNRB 2230 / 1051|F|11:00 AM–1:50 PM (multiple)
+MSB|MSB 494R|On-Campus Experiential Project|David Hollan / Thomas Peterson|TNRB 1051 / 2051 / SFH 36|Th/MW|11:00 AM–5:50 PM (multiple)
+MSB|MSB 496R|Academic Internship|Angelique Pretorius|TBD|TBD|TBD
+MSB|MSB 523|Corporate Governance|Sam Bernards|TBD|MW|12:30–4:45 PM (multiple)
+MSB|MSB 596R|Business Spanish|Yolanda Heyn|TNRB 1321|MW|5:30–6:45 PM
+MSB|MSB 596R|Business German|Jerry Christensen|TNRB 1216|M|5:00–6:50 PM
+MSB|MSB 596R|Business Korean|Juno Baik|TNRB 1401|TTh|5:30–6:45 PM
+MSB|MSB 596R|Business Italian|Sava Cole|TBD|TBD|TBD
+MPA|MPA 615|Public Policy Process|Breck Wightman|JKB 3113|MW|3:30–4:45 PM
+MPA|MPA 623|Nonprofit Structure & Tax|Aaron Miller|TNRB 1315|TTh|2:00–3:15 PM
+MPA|MPA 624|Nonprofit Finance|Aaron Miller|TNRB 1315|TTh|2:00–3:15 PM
+MPA|MPA 626|Public Financial Resource Mgt|David Matkin|JKB 3129 / TNRB 1315 / SLC 411|TTh/T|8:00–9:15 AM / 12:30–1:45 PM / 7:40–9:45 PM
+MPA|MPA 630|Statistical Analysis|Marylis Fantoni|JKB 3129 / SLC 411|MWF/Th|11:00 AM–3:15 PM / 7:40–9:45 PM (multiple)
+MPA|MPA 631|Public Program Evaluation|Dan Heist|JKB 3109|TTh|9:30–10:45 AM
+MPA|MPA 640|Human Resource Management|Breck Wightman|JKB 3113|MW|2:00–3:15 PM
+MPA|MPA 643|Leadership in Public Admin|Travis Ruddle|TNRB 2156|MW|9:30–10:45 AM
+MPA|MPA 644|Negotiations in Public Service|Aaron Miller|TNRB 3325|F|9:30–10:45 AM
+MPA|MPA 647|Career Development|Staci Carroll|TNRB 2401|Th|11:00 AM–12:15 PM
+MPA|MPA 656|Fundraising for Nonprofits|Dan Heist|JKB 3126|TTh|12:30–1:45 PM
+MPA|MPA 659R|Grantwell|Anna Habben|TNRB 2230|T|3:30–4:45 PM
+MPA|MPA 662|Communication in Public Admin|Liz Dixon|SLC 411|Th|5:15–7:20 PM
+MPA|MPA 675|Local Government 1|Travis Ruddle|TNRB 2230|MW|12:30–1:45 PM
+MPA|MPA 690R|Public Mgt Field Study|Aaron Miller|SLC 411|T|5:15–7:20 PM
+MPA|MPA 691R|Readings & Conference|Aaron Miller|TNRB 3325|F|11:00 AM–12:15 PM
+MPA|MPA 692R|Directed Research|Robert Christensen|TBD|TBD|TBD
+MPA|MPA 693R|Field Project|Staci Carroll / David Matkin|TNRB 2230|F|4:00–6:50 PM
+STRAT|STRAT 325|Intro to Management Consulting|Scott Murff|TNRB 2401|TTh|12:30–1:45 PM
+STRAT|STRAT 392|Strategy and Economics|Craig Clawson / Ryan Allen / TBD|TNRB 2220 / 2270|TTh/T/Th|8:00–10:45 AM (multiple)
+STRAT|STRAT 411|Advanced Competitive Strategy|David Bryce|TNRB 1258 / 1230|TTh|9:30 AM–3:15 PM (multiple)
+STRAT|STRAT 412|Strategy Analytics|Ben Lewis|TNRB 2124 / 2325|MW|9:30 AM–1:45 PM (multiple)
+STRAT|STRAT 421|Strategy Implementation|Paul Godfrey / Troy Nielson|TNRB 1140|TTh|3:30–4:45 PM
+STRAT|STRAT 432|Strategic Thinking 2|Mark Hansen|TNRB 3325|M/W|11:00 AM–12:15 PM
+STRAT|STRAT 477R|APM Lab|Craig Clawson|TNRB 2270|F|9:00–11:50 AM
+STRAT|STRAT 490R|Topics in Strategic Management|Jeff Dyer / Scott Murff|TNRB 3128|F|12:30–3:50 PM (multiple)
+STRAT|STRAT 560|Strategy and Economics|TBD|TBD|TBD|TBD`;
+const numOf=c=>parseInt(c.replace(/\D+/g,"").slice(0,3),10)||0;
+const DORD=Object.keys(DEPT);
+const NM=NM_RAW.split("\n").map(l=>{
+  const [dept,code,name,prof,loc,days,time]=l.split("|");
+  return {kind:"nonmba",dept,code,name,prof,loc,days,time,lvl:numOf(code)>=500?"500":"400"};
+}).sort((a,b)=>DORD.indexOf(a.dept)-DORD.indexOf(b.dept)||numOf(a.code)-numOf(b.code)||a.code.localeCompare(b.code));
+const nmTbd=v=>v==="TBD"?`<span class="sub">TBD</span>`:null;
+const nmLines=(v,sep)=>v.split(sep).map(t=>`<div style="white-space:nowrap">${nmTbd(t.trim())||esc(t.trim())}</div>`).join("");
+const nmRow=x=>{
+  const k=doneKey(x),dn=isDone(x),ek=esc(k);
+  const prob=x.time.includes("(multiple)")||x.days.includes("/");
+  return `<tr class="${dn?"done":""}"><td>${starBtn(k)}<span class="code">${esc(x.code)}</span></td>
+    <td>${esc(x.name)}<div class="sub">${esc(DEPT[x.dept])}</div>${prob?`<div class="sub nmwarn">This class has many sections. Please visit <a href="https://commtech.byu.edu/auth/mymap/" target="_blank" rel="noopener">BYU MyMap</a> for the correct information.</div>`:""}</td>
+    <td>${nmTbd(x.prof)||esc(x.prof.replace(/ \/ /g,", "))}</td>
+    <td>${nmTbd(x.days)||esc(x.days.replace(/\//g," / "))}</td>
+    <td>${nmLines(x.time.replace(" (multiple)","")," / ")}</td>
+    <td>${nmTbd(x.loc)||esc(x.loc)}</td>
+    <td><div class="lnks"><button class="lnk" data-done="${ek}">${dn?"Undo completed":"Mark completed"}</button><button class="lnk" data-skip="${ek}">Not interested in this class</button></div></td></tr>`;
+};
+const nmTable=list=>`<div class="tablewrap"><table>
+  <thead><tr><th style="cursor:default">Code</th><th style="cursor:default">Class</th><th style="cursor:default">Professor</th><th style="cursor:default">Days</th><th style="cursor:default">Time</th><th style="cursor:default">Location</th><th style="cursor:default"></th></tr></thead>
+  <tbody>${list.map(nmRow).join("")}</tbody></table></div>`;
+
+function nonView(){
+  const ql=nQ.trim().toLowerCase();
+  const list=NM.filter(x=>vis(x)&&(!nDept||x.dept===nDept)&&(!nLvl||x.lvl===nLvl)&&
+    (!ql||[x.code,x.name,x.prof,DEPT[x.dept]].join(" ").toLowerCase().includes(ql)));
+  const total=NM.filter(vis).length;
+  const depts=DORD.filter(d=>list.some(x=>x.dept===d));
+  return `<div class="note">Non-MBA classes for Winter 2027 (300 level and up), from BYU Class Search. Each row is one class. When a class has many sections, the source combines their rooms, days and times, so those classes are marked: check BYU MyMap for the exact schedule. These can't be added to your schedule or checked for conflicts. TBD means BYU hasn't listed it yet.</div>
+  <div class="controls">
+    <input type="search" id="nq" placeholder="Search code, name, professor" value="${esc(nQ)}" aria-label="Search non-MBA classes">
+    <select id="ndept" aria-label="Filter by department"><option value="">All departments</option>${DORD.map(d=>`<option value="${d}" ${nDept===d?"selected":""}>${d} – ${esc(DEPT[d])}</option>`).join("")}</select>
+    <select id="nlvl" aria-label="Filter by level"><option value="">All levels</option><option value="400" ${nLvl==="400"?"selected":""}>300/400-level</option><option value="500" ${nLvl==="500"?"selected":""}>500/600-level</option></select>
+    ${done.size?doneCtl():""}
+    <span class="sub">${list.length} of ${total} shown</span>
+  </div>`+(depts.length?depts.map(d=>`<h2 class="daytitle">${d} – ${esc(DEPT[d])}</h2>`+nmTable(list.filter(x=>x.dept===d))).join(""):`<div class="note empty">No classes match those filters.</div>`);
+}
+
 function swGroup(k,list){
   const g=[...list].sort((a,b)=>dayRank(a)-dayRank(b)||(a.online?0:a.s)-(b.online?0:b.s)||a.sec.localeCompare(b.sec));
   const o=isOpenAct(k),nAdd=g.filter(x=>sel.has(x.id)).length,key="s:"+k;
-  return `<div class="group sw ${isDone(g[0])?"dn":""}"><h3><span class="acthead">${starBtn(key)}<button class="acthd" data-act="${k}" aria-expanded="${o}">${o?"▾":"▸"} ${esc(TITLES[k])}<span class="sub">SWELL ${k}</span></button></span><span>${nAdd?`${nAdd} added · `:""}${g.length} section${g.length>1?"s":""} · <button class="lnk" data-done="${key}">${isDone(g[0])?"Undo completed":"Mark completed"}</button> · <button class="lnk" data-skip="${key}">Not for me</button></span></h3>${o?`<ul>${g.map(swRow).join("")}</ul>`:""}</div>`;
+  return `<div class="group sw ${isDone(g[0])?"dn":""}"><h3><span class="acthead">${starBtn(key)}<button class="acthd" data-act="${k}" aria-expanded="${o}">${o?"▾":"▸"} ${esc(TITLES[k])}<span class="sub">SWELL ${k}</span></button></span><span>${nAdd?`${nAdd} added · `:""}${g.length} section${g.length>1?"s":""} · <button class="lnk" data-done="${key}">${isDone(g[0])?"Undo completed":"Mark completed"}</button> · <button class="lnk" data-skip="${key}">Not interested in this class</button></span></h3>${o?`<ul>${g.map(swRow).join("")}</ul>`:""}</div>`;
 }
 
 function favsView(){
   const cl=clashIds();
   const m=sorted(C.filter(c=>isFav(c)&&vis(c)));
   const sw=S.filter(x=>isFav(x)&&vis(x));
+  const nm=NM.filter(x=>isFav(x)&&vis(x));
   const byAct={};sw.forEach(x=>(byAct[x.num]=byAct[x.num]||[]).push(x));
   const acts=Object.keys(byAct).sort((a,b)=>TITLES[a].localeCompare(TITLES[b]));
-  if(!m.length&&!acts.length){
+  if(!m.length&&!acts.length&&!nm.length){
     return `<div class="note empty">No favorites yet. Tap the <b>☆</b> next to any MBA or SWELL class and it will be saved here, so you can compare your shortlist and add the sections you want.</div>`+(done.size?`<div class="controls">${doneCtl()}</div>`:"");
   }
   const th=(k,l)=>`<th data-sort="${k}">${l}${sortK===k?(sortDir>0?" ▲":" ▼"):""}</th>`;
@@ -729,6 +919,7 @@ function favsView(){
     autoOpen=sw.length<=30;
     html+=`<h2 class="daytitle">SWELL classes</h2>`+acts.map(k=>swGroup(k,byAct[k])).join("");
   }
+  if(nm.length)html+=`<h2 class="daytitle">Non-MBA classes</h2>`+nmTable(nm);
   return html;
 }
 
@@ -737,11 +928,12 @@ function skipView(){
   const add=(x,title,kind)=>{const k=doneKey(x);(items[k]=items[k]||{k,title,kind,n:0}).n++};
   C.forEach(c=>{if(isSkip(c))add(c,c.code.split("-")[0]+" "+c.name,"MBA")});
   S.forEach(x=>{if(isSkip(x))add(x,"SWELL "+x.num+" "+x.name,"SWELL")});
+  NM.forEach(x=>{if(isSkip(x))add(x,x.code+" "+x.name,"Non-MBA")});
   const list=Object.values(items).sort((a,b)=>a.kind.localeCompare(b.kind)||a.title.localeCompare(b.title));
-  if(!list.length)return `<div class="note empty">Nothing here. Click <b>Not for me</b> on a class you don't want to see and it will be hidden from every list and parked here.</div>`;
+  if(!list.length)return `<div class="note empty">Nothing here. Click <b>Not interested in this class</b> on a class you don't want to see and it will be hidden from every list and parked here.</div>`;
   return `<div class="note">These classes are hidden from every list and from the overlap warnings. Bring one back and it returns to the lists.</div>
   <div class="controls"><span class="sub">${list.length} class${list.length===1?"":"es"} hidden</span><button class="clear" data-clearskip="1">Bring all back</button></div>
-  <div class="group"><ul>${list.map(i=>`<li><span class="nm"><b>${esc(i.title)}</b><div class="sub">${i.n} section${i.n===1?"":"s"}</div></span><span class="tag ${i.kind==="SWELL"?"ok":""}">${i.kind}</span><button class="add" data-skip="${esc(i.k)}">Bring back</button></li>`).join("")}</ul></div>`;
+  <div class="group"><ul>${list.map(i=>`<li><span class="nm"><b>${esc(i.title)}</b>${i.kind==="Non-MBA"?"":`<div class="sub">${i.n} section${i.n===1?"":"s"}</div>`}</span><span class="tag ${i.kind==="SWELL"?"ok":""}">${i.kind}</span><button class="add" data-skip="${esc(i.k)}">Bring back</button></li>`).join("")}</ul></div>`;
 }
 
 function render(keepFocus){
@@ -751,8 +943,8 @@ function render(keepFocus){
   document.getElementById("cntskip").textContent=skips.size;
   document.querySelectorAll(".tab").forEach(t=>t.setAttribute("aria-selected",t.dataset.tab===tab));
   const v=document.getElementById("view");
-  v.innerHTML=tab==="all"?allView():tab==="slots"?slotsView():tab==="fill"?fillView():tab==="favs"?favsView():tab==="skip"?skipView():mineView();
-  if(keepFocus){const el=document.getElementById(tab==="fill"?"swq":"q");const len=tab==="fill"?swQ.length:q.length;if(el){el.focus();el.setSelectionRange(len,len)}}
+  v.innerHTML=tab==="all"?allView():tab==="slots"?slotsView():tab==="fill"?fillView():tab==="favs"?favsView():tab==="skip"?skipView():tab==="nonmba"?nonView():mineView();
+  if(keepFocus){const el=document.getElementById(tab==="fill"?"swq":tab==="nonmba"?"nq":"q");const len=tab==="fill"?swQ.length:tab==="nonmba"?nQ.length:q.length;if(el){el.focus();el.setSelectionRange(len,len)}}
 }
 
 const keepY=fn=>{const y=window.scrollY;fn();render();window.scrollTo(0,y)};
@@ -780,11 +972,14 @@ document.addEventListener("click",e=>{
 document.addEventListener("input",e=>{
   if(e.target.id==="q"){q=e.target.value;focusId=null;render(true)}
   if(e.target.id==="swq"){swQ=e.target.value;render(true)}
+  if(e.target.id==="nq"){nQ=e.target.value;render(true)}
 });
 document.addEventListener("change",e=>{
   const id=e.target.id,v=e.target.value;
   if(id==="day"){dayF=v;focusId=null;render()}
   if(id==="full"){hideFull=e.target.checked;render()}
+  if(id==="ndept"){nDept=v;render()}
+  if(id==="nlvl"){nLvl=v;render()}
   if(id==="swday"){swDay=v;render()}
   if(id==="swafter"){swAfter=v===""?"":+v;render()}
   if(id==="swbefore"){swBefore=v===""?"":+v;render()}
